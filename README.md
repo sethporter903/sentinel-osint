@@ -9,7 +9,7 @@
 
 ## Overview
 
-A Jupyter-based OSINT tool that queries three public data sources — WHOIS, GitHub, and HaveIBeenPwned — and passes the structured results to an Anthropic Claude model to generate a formatted threat intelligence report.
+A Jupyter-based OSINT tool that queries five public data sources — WHOIS, GitHub, HaveIBeenPwned, Shodan, and VirusTotal — and passes the structured results to an Anthropic Claude model to generate a formatted threat intelligence report.
 
 Built as a portfolio project to demonstrate:
 - LLM-assisted OSINT collection and report generation
@@ -33,7 +33,9 @@ osint_tool/
 ├── modules/
 │   ├── whois_lookup.py     # WHOIS registration data
 │   ├── github_recon.py     # GitHub profile and repository recon
-│   └── hibp_lookup.py      # HaveIBeenPwned breach and paste data
+│   ├── hibp_lookup.py      # HaveIBeenPwned breach and paste data
+│   ├── shodan_lookup.py    # Shodan port/service/CVE scan
+│   └── virustotal_lookup.py# VirusTotal domain reputation
 ├── requirements.txt
 ├── .gitignore
 └── README.md
@@ -45,8 +47,10 @@ osint_tool/
 TARGET DOMAIN / USERNAME / EMAIL
         │
         ├─► WHOIS query ──────────────────┐
-        ├─► GitHub API query ─────────────┤──► LLM Prompt (delimited) ──► TI Report
-        └─► HaveIBeenPwned API query ─────┘
+        ├─► GitHub API query ─────────────┤
+        ├─► HaveIBeenPwned API query ─────┼──► LLM Prompt (delimited) ──► TI Report
+        ├─► Shodan host scan ─────────────┤
+        └─► VirusTotal domain lookup ─────┘
 ```
 
 ---
@@ -55,11 +59,13 @@ TARGET DOMAIN / USERNAME / EMAIL
 
 This tool intentionally exposes and demonstrates the **indirect prompt injection** vulnerability that affects all LLM-assisted OSINT pipelines.
 
-All three data sources return unverified public content that flows directly into the LLM prompt. An adversary who anticipates being queried by an LLM-assisted tool can embed instruction payloads in:
+All five data sources return unverified public content that flows directly into the LLM prompt. An adversary who anticipates being queried by an LLM-assisted tool can embed instruction payloads in:
 
 - WHOIS registrant name or organization fields
 - GitHub bio, repository names, or descriptions
 - HaveIBeenPwned breach metadata (less likely but structurally possible)
+- Shodan banner data returned by exposed services
+- VirusTotal community comments or category labels
 
 **Cell 6 of the notebook demonstrates this attack live** using a locally constructed poisoned WHOIS record. No external systems are queried in that cell.
 
@@ -83,6 +89,8 @@ All three data sources return unverified public content that flows directly into
 - Python 3.11+
 - Anthropic API key ([console.anthropic.com](https://console.anthropic.com))
 - HaveIBeenPwned API key ([haveibeenpwned.com/API/Key](https://haveibeenpwned.com/API/Key)) — ~$4/year personal tier
+- Shodan API key ([account.shodan.io](https://account.shodan.io)) — free tier available; each host lookup costs 1 query credit
+- VirusTotal API key ([virustotal.com/gui/join-us](https://www.virustotal.com/gui/join-us)) — free tier: 4 req/min, 500 req/day
 - GitHub personal access token (optional — raises rate limit from 60 to 5,000 req/hr)
 
 ### Install
@@ -100,6 +108,8 @@ Never hardcode keys. Set them as environment variables:
 ```bash
 export ANTHROPIC_API_KEY='your-anthropic-key'
 export HIBP_API_KEY='your-hibp-key'
+export SHODAN_API_KEY='your-shodan-key'
+export VT_API_KEY='your-virustotal-key'
 export GITHUB_TOKEN='your-github-token'   # optional
 ```
 
@@ -120,7 +130,9 @@ The tool produces two exports per run (Cell 8):
 **`report_<domain>_<timestamp>.md`** — structured intelligence report with sections:
 - Subject Summary
 - Infrastructure Indicators
+- Network Exposure (Shodan)
 - Technical Profile
+- Domain Reputation (VirusTotal)
 - Credential and Breach Exposure
 - Analyst Assessment (with confidence level)
 - Recommended Follow-On Collection
@@ -153,8 +165,8 @@ Query only domains, accounts, and email addresses you are authorized to research
 
 ## Roadmap
 
-- [ ] Shodan integration for port/service enumeration
-- [ ] VirusTotal domain reputation lookup
+- [x] Shodan integration for port/service enumeration
+- [x] VirusTotal domain reputation lookup
 - [ ] URLScan.io screenshot and DOM analysis
 - [ ] Structured JSON report schema (STIX 2.1 alignment)
 - [ ] Batch target processing
