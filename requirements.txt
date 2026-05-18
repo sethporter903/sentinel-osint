@@ -17,3 +17,8 @@ ipykernel==6.29.0
 
 # Pretty display inside notebooks
 ipython==8.22.0
+
+# Shodan host intelligence API
+shodan==1.31.0
+
+# VirusTotal uses the requests library already listed above
