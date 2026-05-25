@@ -1,156 +1,170 @@
 # OSINT Threat Intelligence Tool
-### LLM-Assisted Infrastructure and Identity Analysis
 
-![Python](https://img.shields.io/badge/Python-3.11+-blue)
-![Anthropic](https://img.shields.io/badge/LLM-Anthropic%20Claude-orange)
-![License](https://img.shields.io/badge/License-MIT-green)
+**LLM-Assisted Infrastructure and Identity Analysis**
+
+[![Python](https://img.shields.io/badge/Python-3.11+-blue)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688)](https://fastapi.tiangolo.com)
+[![React](https://img.shields.io/badge/Frontend-React-61DAFB)](https://react.dev)
+[![LLM](https://img.shields.io/badge/LLM-Anthropic%20Claude-orange)](https://anthropic.com)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 ---
 
 ## Overview
 
-A Jupyter-based OSINT tool that queries five public data sources — WHOIS, GitHub, HaveIBeenPwned, Shodan, and VirusTotal — and passes the structured results to an Anthropic Claude model to generate a formatted threat intelligence report.
+An LLM-assisted OSINT pipeline that aggregates data from WHOIS, VirusTotal, GitHub, and Reddit, then passes the structured results to an Anthropic Claude model to generate a formatted threat intelligence report.
 
-Built as a portfolio project to demonstrate:
+This project exists in two versions:
+
+| Version | Description | Entry Point |
+|---|---|---|
+| **v1 — Notebook** | Jupyter-based prototype. Includes a live prompt injection demonstration and mitigation analysis. | `notebook/osint_report.ipynb` |
+| **v2 — Full Stack** | Production-grade FastAPI backend + React frontend with real-time scan UI and AI-generated reports. | `backend/` + `frontend/` |
+
+Built to demonstrate:
 - LLM-assisted OSINT collection and report generation
 - **Indirect prompt injection risk** in AI-powered intelligence pipelines
 - Practical mitigations for LLM input trust boundary violations
+- Full-stack AI application engineering (REST API + React UI)
 - Applied threat intelligence tradecraft in an AI engineering context
 
-This tool is a companion to the research paper:
-> *Vulnerability Landscape of Large Language Models: Attack Vectors, Exploitation Techniques, and Defensive Controls* (2026)
-
-The injection demonstration in Cell 6 of the notebook operationalizes the vulnerability class documented in Section 3 and Section 15 of that paper.
-
 ---
 
-## Architecture
+## v2 — Full Stack Demo
 
-```
-osint_tool/
-├── osint_report.ipynb      # Main notebook — run this
-├── llm_analyst.py          # Anthropic API integration and prompt construction
-├── modules/
-│   ├── whois_lookup.py     # WHOIS registration data
-│   ├── github_recon.py     # GitHub profile and repository recon
-│   ├── hibp_lookup.py      # HaveIBeenPwned breach and paste data
-│   ├── shodan_lookup.py    # Shodan port/service/CVE scan
-│   └── virustotal_lookup.py# VirusTotal domain reputation
-├── requirements.txt
-├── .gitignore
-└── README.md
-```
+The v2 interface accepts a domain, IP, or username, fans out to four data sources concurrently, and generates a structured AI threat assessment in real time.
 
-**Data flow:**
+**Stack:** FastAPI · React · Vite · Anthropic Claude · VirusTotal API · GitHub API · Reddit API · python-whois
 
-```
-TARGET DOMAIN / USERNAME / EMAIL
-        │
-        ├─► WHOIS query ──────────────────┐
-        ├─► GitHub API query ─────────────┤
-        ├─► HaveIBeenPwned API query ─────┼──► LLM Prompt (delimited) ──► TI Report
-        ├─► Shodan host scan ─────────────┤
-        └─► VirusTotal domain lookup ─────┘
-```
+### Run Locally
 
----
-
-## Prompt Injection Risk — By Design
-
-This tool intentionally exposes and demonstrates the **indirect prompt injection** vulnerability that affects all LLM-assisted OSINT pipelines.
-
-All five data sources return unverified public content that flows directly into the LLM prompt. An adversary who anticipates being queried by an LLM-assisted tool can embed instruction payloads in:
-
-- WHOIS registrant name or organization fields
-- GitHub bio, repository names, or descriptions
-- HaveIBeenPwned breach metadata (less likely but structurally possible)
-- Shodan banner data returned by exposed services
-- VirusTotal community comments or category labels
-
-**Cell 6 of the notebook demonstrates this attack live** using a locally constructed poisoned WHOIS record. No external systems are queried in that cell.
-
-### Mitigations Implemented
-
-| Mitigation | Implementation | Limitation |
-|---|---|---|
-| Delimiter tags | All external data wrapped in `<external_data>` tags | Sophisticated payloads can escape delimiter context |
-| System/user separation | Role and trust instructions in system prompt, data in user message | Does not prevent all context blending |
-| Model self-reporting | LLM instructed to flag detected injection attempts | Soft control — model can be deceived |
-| Analyst warning banner | Injection flag surfaced visually in notebook output | Depends on analyst reading the warning |
-
-**No mitigation substitutes for human analyst review before acting on output.**
-
----
-
-## Setup
-
-### Requirements
-
-- Python 3.11+
-- Anthropic API key ([console.anthropic.com](https://console.anthropic.com))
-- HaveIBeenPwned API key ([haveibeenpwned.com/API/Key](https://haveibeenpwned.com/API/Key)) — ~$4/year personal tier
-- Shodan API key ([account.shodan.io](https://account.shodan.io)) — free tier available; each host lookup costs 1 query credit
-- VirusTotal API key ([virustotal.com/gui/join-us](https://www.virustotal.com/gui/join-us)) — free tier: 4 req/min, 500 req/day
-- GitHub personal access token (optional — raises rate limit from 60 to 5,000 req/hr)
-
-### Install
-
+**Backend**
 ```bash
-git clone https://github.com/YOUR_USERNAME/osint-ti-tool.git
-cd osint-ti-tool
+cd backend
 pip install -r requirements.txt
+# Add your API keys to .env (see .env.example)
+python -m uvicorn main:app --reload
 ```
 
-### Configure API Keys
-
-Never hardcode keys. Set them as environment variables:
-
+**Frontend**
 ```bash
-export ANTHROPIC_API_KEY='your-anthropic-key'
-export HIBP_API_KEY='your-hibp-key'
-export SHODAN_API_KEY='your-shodan-key'
-export VT_API_KEY='your-virustotal-key'
-export GITHUB_TOKEN='your-github-token'   # optional
+cd frontend
+npm install
+npm run dev
 ```
+
+Open `http://localhost:5173` — the Vite proxy forwards `/analyze` requests to the FastAPI backend on port 8000.
+
+### API
+
+```
+GET /analyze?target={domain|ip|username}
+```
+
+Returns a unified JSON response:
+
+```json
+{
+  "target": "example.com",
+  "whois": { ... },
+  "virustotal": { "reputation": { ... }, "indicators": [ ... ] },
+  "github": { "found": true, "repos": [ ... ] },
+  "reddit": { "posts": [ ... ] },
+  "report": "AI-generated threat assessment..."
+}
+```
+
+---
+
+## v1 — Jupyter Notebook
+
+The original prototype queries five sources — WHOIS, GitHub, HaveIBeenPwned, Shodan, and VirusTotal — and generates a structured markdown threat report.
+
+**Cell 6 demonstrates a live indirect prompt injection attack** using a locally constructed poisoned WHOIS record. No external systems are queried in that cell.
 
 ### Run
 
 ```bash
+cd notebook
+pip install -r requirements.txt
 jupyter notebook osint_report.ipynb
 ```
 
 Set your target in Cell 2, then run all cells.
 
----
+### Prompt Injection Risk — By Design
 
-## Output
+All five data sources return unverified public content that flows into the LLM prompt. An adversary who anticipates being queried by an LLM-assisted tool can embed instruction payloads in WHOIS registrant fields, GitHub bios, Shodan banner data, or VirusTotal community comments.
 
-The tool produces two exports per run (Cell 8):
+| Mitigation | Implementation | Limitation |
+|---|---|---|
+| Delimiter tags | External data wrapped in `<external_data>` tags | Sophisticated payloads can escape delimiter context |
+| System/user separation | Trust instructions in system prompt, data in user message | Does not prevent all context blending |
+| Model self-reporting | LLM instructed to flag detected injection attempts | Soft control — model can be deceived |
+| Analyst warning banner | Injection flag surfaced visually in notebook output | Depends on analyst reading the warning |
 
-**`report_<domain>_<timestamp>.md`** — structured intelligence report with sections:
-- Subject Summary
-- Infrastructure Indicators
-- Network Exposure (Shodan)
-- Technical Profile
-- Domain Reputation (VirusTotal)
-- Credential and Breach Exposure
-- Analyst Assessment (with confidence level)
-- Recommended Follow-On Collection
-- Data Quality Notes
-- Injection Attempt Detected (if applicable)
+**No mitigation substitutes for human analyst review before acting on output.**
 
-**`data_<domain>_<timestamp>.json`** — raw data sidecar including all API responses and LLM metadata (model, token counts, injection warning flag).
+This tool is a companion to the research paper:
+> *Vulnerability Landscape of Large Language Models: Attack Vectors, Exploitation Techniques, and Defensive Controls* (2026)
 
-Both files are excluded from git by `.gitignore` — they may contain PII.
+The injection demonstration in Cell 6 operationalizes the vulnerability class documented in Sections 3 and 15 of that paper.
 
 ---
 
-## Before Committing
+## Project Structure
 
-Clear notebook cell outputs before every commit to prevent accidental exposure of query results:
+```
+osint-llm-analyst/
+├── notebook/
+│   ├── osint_report.ipynb      # Main notebook — run this
+│   ├── llm_analyst.py          # Anthropic API integration
+│   └── modules/
+│       ├── whois_lookup.py
+│       ├── github_recon.py
+│       ├── hibp_lookup.py
+│       ├── shodan_lookup.py
+│       └── virustotal_lookup.py
+├── backend/
+│   ├── main.py                 # FastAPI routes
+│   ├── fetchers.py             # Async data source integrations
+│   └── requirements.txt
+├── frontend/
+│   ├── src/
+│   │   ├── App.jsx             # Main UI component
+│   │   └── main.jsx
+│   ├── index.html
+│   ├── vite.config.js
+│   └── package.json
+├── .env.example
+├── .gitignore
+└── README.md
+```
+
+---
+
+## Setup
+
+### API Keys Required
+
+| Key | Source | Notes |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | [console.anthropic.com](https://console.anthropic.com) | Required for report generation |
+| `VT_API_KEY` | [virustotal.com](https://www.virustotal.com/gui/join-us) | Free tier: 500 req/day |
+| `GITHUB_TOKEN` | GitHub → Settings → Developer Settings | Optional; raises rate limit to 30 req/min |
+| `SHODAN_API_KEY` | [account.shodan.io](https://account.shodan.io) | v1 notebook only |
+| `HIBP_API_KEY` | [haveibeenpwned.com](https://haveibeenpwned.com/API/Key) | v1 notebook only; ~$4/year |
+
+Copy `.env.example` to `.env` and fill in your keys. Never commit `.env`.
+
+---
+
+## Before Committing (Notebook)
+
+Clear cell outputs before every commit to prevent accidental exposure of query results:
 
 ```bash
-jupyter nbconvert --clear-output --inplace osint_report.ipynb
+jupyter nbconvert --clear-output --inplace notebook/osint_report.ipynb
 git add .
 git commit -m "your message"
 ```
@@ -165,12 +179,17 @@ Query only domains, accounts, and email addresses you are authorized to research
 
 ## Roadmap
 
-- [x] Shodan integration for port/service enumeration
-- [x] VirusTotal domain reputation lookup
-- [ ] URLScan.io screenshot and DOM analysis
-- [ ] Structured JSON report schema (STIX 2.1 alignment)
+- [x] WHOIS, GitHub, Reddit, VirusTotal integration
+- [x] FastAPI backend with async concurrent data fetching
+- [x] React frontend with real-time scan UI
+- [x] AI-generated threat narrative via Claude API
+- [x] JSON and PDF report export
+- [x] Prompt injection demonstration and mitigation (v1)
+- [ ] Shodan integration in v2 backend
+- [ ] HaveIBeenPwned integration in v2 backend
+- [ ] STIX 2.1 structured report output
 - [ ] Batch target processing
-- [ ] Injection detection accuracy evaluation against known payloads
+- [ ] Deployed live demo
 
 ---
 
