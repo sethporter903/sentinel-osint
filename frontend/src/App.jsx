@@ -20,13 +20,19 @@ const DEMO_TARGETS = {
       { type: "Email", value: "admin@protonmail.com", source: "WHOIS", risk: "medium" },
       { type: "ASN", value: "AS209100 (Tor Exit)", source: "IP Lookup", risk: "critical" },
     ],
-    github: { found: false, repos: [] },
-    reddit: [
-      { sub: "r/cybersecurity", text: "Anyone else seeing phishing emails from malicious-domain.xyz?", score: 47 },
-      { sub: "r/netsec", text: "IOC dump: malicious-domain.xyz hitting corporate inboxes", score: 112 },
-    ],
+    github: {
+      source: "github", status: "success", verdict: "suspicious", confidence: "low",
+      summary: "GitHub: 2 relevant result(s) out of 14 total (12 filtered as proxy lists or dumps).",
+      raw: {
+        total_count: 14, relevant_count: 2, filtered_count: 12,
+        repos: [
+          { name: "security-researcher/ioc-list", description: "Known phishing domains — malicious-domain.xyz confirmed active Nov 2024", url: "https://github.com/security-researcher/ioc-list", stars: 234, updated: "2024-11-10T12:00:00Z", topics: ["threat-intel", "ioc"], relevant: true },
+          { name: "analyst/phishing-tracker", description: "Tracking active phishing infrastructure targeting corporate SSO portals", url: "https://github.com/analyst/phishing-tracker", stars: 45, updated: "2024-11-08T09:00:00Z", topics: ["phishing", "security"], relevant: true },
+        ],
+      },
+    },
     riskScore: 87,
-    narrative: `This domain presents a high-confidence phishing infrastructure profile. Registered November 2024 (age: ~6 months), it uses privacy-shielded WHOIS through a Panama registrar — a common pattern for disposable phishing domains. The associated IP (185.220.101.47) resolves to ASN AS209100, a known Tor exit node cluster frequently abused for credential harvesting operations.\n\nPassive DNS reveals a subdomain "login.malicious-domain.xyz," strongly suggesting credential phishing targeting corporate SSO or banking portals. Community intelligence from Reddit confirms active phishing campaigns with 2 corroborating reports in the last 30 days.\n\nRecommendation: Block at DNS and email gateway layers. Flag ASN AS209100 for broader blocking. Submit to threat feeds for downstream propagation.`,
+    narrative: `This domain presents a high-confidence phishing infrastructure profile. Registered November 2024 (age: ~6 months), it uses privacy-shielded WHOIS through a Panama registrar — a common pattern for disposable phishing domains. The associated IP (185.220.101.47) resolves to ASN AS209100, a known Tor exit node cluster frequently abused for credential harvesting operations.\n\nPassive DNS reveals a subdomain "login.malicious-domain.xyz," strongly suggesting credential phishing targeting corporate SSO or banking portals. Corroborating intelligence from OTX threat feeds and GitHub security repositories confirms active phishing campaigns.\n\nRecommendation: Block at DNS and email gateway layers. Flag ASN AS209100 for broader blocking. Submit to threat feeds for downstream propagation.`,
   },
   "192.168.1.100": {
     type: "ip",
@@ -39,8 +45,11 @@ const DEMO_TARGETS = {
     indicators: [
       { type: "IP", value: "192.168.1.100", source: "Input", risk: "low" },
     ],
-    github: { found: false, repos: [] },
-    reddit: [],
+    github: {
+      source: "github", status: "not_found", verdict: "unknown", confidence: "low",
+      summary: "Target not mentioned in any GitHub repository.",
+      raw: { total_count: 0, relevant_count: 0, filtered_count: 0, repos: [] },
+    },
     riskScore: 5,
     narrative: `192.168.1.100 falls within RFC1918 private address space (192.168.0.0/16) and is not routable on the public internet. No OSINT data is available for private IPs via public sources.\n\nThis target may be relevant in the context of internal network investigations, lateral movement analysis, or misconfigured asset discovery. Recommend pivoting to internal SIEM/EDR data for investigation.`,
   },
@@ -50,7 +59,7 @@ const STEPS = [
   { id: "whois", label: "WHOIS Lookup", icon: "🔍", duration: 1200 },
   { id: "dns", label: "Passive DNS Resolution", icon: "🌐", duration: 900 },
   { id: "github", label: "GitHub Intelligence", icon: "💻", duration: 1400 },
-  { id: "reddit", label: "Reddit / Forum Scan", icon: "📡", duration: 800 },
+  { id: "threatfeeds", label: "Threat Feed Correlation", icon: "🎯", duration: 1000 },
   { id: "ioc", label: "IOC Aggregation", icon: "⚠️", duration: 600 },
   { id: "llm", label: "Generating AI Report", icon: "🤖", duration: 1800 },
 ];
@@ -132,7 +141,7 @@ const runScan = async (t) => {
     }
 
     try {
-      const response = await fetch(`http://localhost:8000/analyze?target=${encodeURIComponent(tgt)}`);
+      const response = await fetch(`/api/analyze?target=${encodeURIComponent(tgt)}`);
       const data = await response.json();
       setResult(data);
     } catch (err) {
@@ -246,7 +255,7 @@ const exportJSON = () => {
             Threat Intelligence Lookup
           </div>
           <div style={{ color: "#555", fontSize: "13px", marginBottom: "24px" }}>
-            Aggregate OSINT from WHOIS, passive DNS, GitHub, and community sources
+            Aggregate OSINT from WHOIS, passive DNS, GitHub, AbuseIPDB, and threat intelligence feeds
           </div>
 
           <div style={{ display: "flex", gap: "8px", marginBottom: "16px" }}>
@@ -428,22 +437,42 @@ const exportJSON = () => {
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                   <div style={{ background: "#0d1017", border: "1px solid #ffffff10", borderRadius: "10px", padding: "20px" }}>
-                    <div style={{ color: "#555", fontSize: "11px", letterSpacing: "0.1em", marginBottom: "14px" }}>COMMUNITY SIGNALS</div>
-                    {result.reddit.length === 0 ? (
-                      <div style={{ color: "#333", fontSize: "13px" }}>No mentions found</div>
-                    ) : (result.reddit?.posts || []).map((r, i) => (
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "14px" }}>
+                      <div style={{ color: "#555", fontSize: "11px", letterSpacing: "0.1em" }}>GITHUB INTEL</div>
+                      {(result.github?.raw?.total_count > 0) && (
+                        <div style={{ color: "#555", fontSize: "11px", fontFamily: "'JetBrains Mono', monospace" }}>
+                          {result.github.raw.relevant_count} relevant / {result.github.raw.total_count} total
+                        </div>
+                      )}
+                    </div>
+                    {(result.github?.raw?.repos || []).filter(r => r.relevant).length === 0 ? (
+                      <div style={{ color: "#333", fontSize: "13px" }}>No relevant repositories found</div>
+                    ) : (result.github.raw.repos.filter(r => r.relevant)).map((r, i) => (
                       <div key={i} style={{ borderLeft: "2px solid #ffffff15", paddingLeft: "12px", marginBottom: "12px" }}>
-                        <div style={{ color: "#00e5ff", fontSize: "11px", marginBottom: "4px", fontFamily: "'JetBrains Mono', monospace" }}>{r.sub}</div>
-                        <div style={{ color: "#aaa", fontSize: "12px", marginBottom: "4px" }}>{r.text}</div>
-                        <div style={{ color: "#555", fontSize: "11px" }}>↑ {r.score}</div>
+                        <a href={r.url} target="_blank" rel="noreferrer" style={{ color: "#00e5ff", fontSize: "11px", marginBottom: "4px", fontFamily: "'JetBrains Mono', monospace", textDecoration: "none", display: "block" }}>
+                          {r.name}
+                        </a>
+                        {r.description && (
+                          <div style={{ color: "#aaa", fontSize: "12px", marginBottom: "4px" }}>{r.description}</div>
+                        )}
+                        <div style={{ color: "#555", fontSize: "11px" }}>★ {r.stars}</div>
                       </div>
                     ))}
                   </div>
                   <div style={{ background: "#0d1017", border: "1px solid #ffffff10", borderRadius: "10px", padding: "20px" }}>
-                    <div style={{ color: "#555", fontSize: "11px", letterSpacing: "0.1em", marginBottom: "14px" }}>GITHUB INTEL</div>
-                    <div style={{ color: result.github.found ? "#e0e0e0" : "#333", fontSize: "13px" }}>
-                      {result.github.found ? `${result.github.repos.length} repos found` : "No GitHub presence detected"}
-                    </div>
+                    <div style={{ color: "#555", fontSize: "11px", letterSpacing: "0.1em", marginBottom: "14px" }}>THREAT FEEDS</div>
+                    {[
+                      { label: "OTX Pulses", value: result.otx?.raw?.pulse_count ?? "—", warn: (result.otx?.raw?.pulse_count || 0) > 0 },
+                      { label: "AbuseIPDB Score", value: result.abuseipdb?.status === "not_applicable" ? "N/A" : `${result.abuseipdb?.raw?.abuseConfidenceScore ?? "—"}/100`, warn: (result.abuseipdb?.raw?.abuseConfidenceScore || 0) > 25 },
+                      { label: "URLhaus", value: result.urlhaus?.status === "not_applicable" ? "N/A" : result.urlhaus?.verdict === "malicious" ? "Flagged" : result.urlhaus?.status === "not_found" ? "Clean" : "—", warn: result.urlhaus?.verdict === "malicious" },
+                    ].map(({ label, value, warn }) => (
+                      <div key={label} style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
+                        <span style={{ color: "#555", fontSize: "12px", fontFamily: "'JetBrains Mono', monospace" }}>{label}</span>
+                        <span style={{ color: warn ? "#ff8c42" : "#00e676", fontSize: "12px", fontFamily: "'JetBrains Mono', monospace" }}>
+                          {value}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -480,8 +509,8 @@ const exportJSON = () => {
                 {[
                   { name: "WHOIS", status: "success", records: 7, icon: "🔍" },
                   { name: "Passive DNS", status: "success", records: 3, icon: "🌐" },
-                  { name: "GitHub", status: result.github.found ? "success" : "empty", records: result.github.repos.length, icon: "💻" },
-                  { name: "Reddit", status: result.reddit.length > 0 ? "success" : "empty", records: result.reddit.length, icon: "📡" },
+                  { name: "GitHub", status: (result.github?.raw?.relevant_count || 0) > 0 ? "success" : "empty", records: result.github?.raw?.relevant_count || 0, icon: "💻" },
+                  { name: "OTX", status: (result.otx?.raw?.pulse_count || 0) > 0 ? "success" : "empty", records: result.otx?.raw?.pulse_count || 0, icon: "🎯" },
                   { name: "AbuseIPDB", status: "success", records: 2, icon: "🛡️" },
                   { name: "VirusTotal", status: "partial", records: 1, icon: "🔬" },
                 ].map(s => (
@@ -512,7 +541,33 @@ const exportJSON = () => {
                   whiteSpace: "pre-wrap", fontFamily: "Georgia, serif",
                   borderLeft: "2px solid #00e5ff44", paddingLeft: "20px",
                 }}>
-                  {result.report}
+                  {typeof result.report === 'object' ? (
+  <div>
+    <div style={{ marginBottom: "16px" }}>
+      <span style={{ color: result.report.verdict === "malicious" ? "#ff4444" : result.report.verdict === "suspicious" ? "#ffaa00" : "#00e5ff", fontWeight: "bold", textTransform: "uppercase", fontSize: "13px" }}>
+        {result.report.verdict}
+      </span>
+      <span style={{ color: "#555", fontSize: "12px", marginLeft: "10px" }}>confidence: {result.report.confidence}</span>
+    </div>
+    <p style={{ marginBottom: "20px" }}>{result.report.summary}</p>
+    {result.report.key_findings?.length > 0 && (
+      <div style={{ marginBottom: "20px" }}>
+        <div style={{ color: "#00e5ff", fontSize: "12px", marginBottom: "10px" }}>KEY FINDINGS</div>
+        {result.report.key_findings.map((f, i) => (
+          <div key={i} style={{ marginBottom: "8px", paddingLeft: "12px", borderLeft: "2px solid #00e5ff44" }}>• {f}</div>
+        ))}
+      </div>
+    )}
+    {result.report.recommended_actions?.length > 0 && (
+      <div>
+        <div style={{ color: "#00e5ff", fontSize: "12px", marginBottom: "10px" }}>RECOMMENDED ACTIONS</div>
+        {result.report.recommended_actions.map((a, i) => (
+          <div key={i} style={{ marginBottom: "8px", paddingLeft: "12px", borderLeft: "2px solid #ffffff22" }}>• {a}</div>
+        ))}
+      </div>
+    )}
+  </div>
+) : result.report}
                 </div>
               </div>
             )}

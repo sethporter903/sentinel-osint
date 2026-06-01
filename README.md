@@ -12,7 +12,7 @@
 
 ## Overview
 
-An LLM-assisted OSINT pipeline that aggregates data from WHOIS, VirusTotal, GitHub, and Reddit, then passes the structured results to an Anthropic Claude model to generate a formatted threat intelligence report.
+An LLM-assisted OSINT pipeline that aggregates data from WHOIS, VirusTotal, GitHub, and AbuseIPDB, then passes the structured results to an Anthropic Claude model to generate a formatted threat intelligence report.
 
 This project exists in two versions:
 
@@ -34,7 +34,7 @@ Built to demonstrate:
 
 The v2 interface accepts a domain, IP, or username, fans out to four data sources concurrently, and generates a structured AI threat assessment in real time.
 
-**Stack:** FastAPI · React · Vite · Anthropic Claude · VirusTotal API · GitHub API · Reddit API · python-whois
+**Stack:** FastAPI · React · Vite · Anthropic Claude · VirusTotal API · GitHub API · AbuseIPDB API · python-whois
 
 ### Run Locally
 
@@ -69,7 +69,7 @@ Returns a unified JSON response:
   "whois": { ... },
   "virustotal": { "reputation": { ... }, "indicators": [ ... ] },
   "github": { "found": true, "repos": [ ... ] },
-  "reddit": { "posts": [ ... ] },
+  "AbuseIPDB": { "posts": [ ... ] },
   "report": "AI-generated threat assessment..."
 }
 ```
@@ -179,7 +179,7 @@ Query only domains, accounts, and email addresses you are authorized to research
 
 ## Roadmap
 
-- [x] WHOIS, GitHub, Reddit, VirusTotal integration
+- [x] WHOIS, GitHub, AbuseIPDB, VirusTotal integration
 - [x] FastAPI backend with async concurrent data fetching
 - [x] React frontend with real-time scan UI
 - [x] AI-generated threat narrative via Claude API
