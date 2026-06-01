@@ -112,6 +112,122 @@ function ScoreMeter({ score }) {
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Derive a flat list of indicator rows from the new multi-source response shape.
+// Each source contributes zero or more rows; sources that returned
+// status "not_applicable" or "not_found" contribute nothing.
+// ─────────────────────────────────────────────────────────────────────────────
+function buildIndicators(result) {
+  if (!result) return [];
+  const out = [];
+
+  // Map verdict + confidence → RiskBadge level
+  function riskLevel(verdict, confidence) {
+    if (verdict === "malicious") {
+      return confidence === "high" ? "critical" : confidence === "medium" ? "high" : "medium";
+    }
+    if (verdict === "suspicious") {
+      return confidence === "high" ? "high" : confidence === "medium" ? "medium" : "low";
+    }
+    return "low";
+  }
+
+  // ── AlienVault OTX ────────────────────────────────────────────────────
+  const otx = result.otx;
+  if (otx?.status === "success" && (otx.raw?.pulse_count || 0) > 0) {
+    out.push({ type: "Threat Intel", value: `${otx.raw.pulse_count} pulse(s) found`, source: "AlienVault OTX", risk: riskLevel(otx.verdict, otx.confidence) });
+    for (const fam of otx.raw?.malware_families || [])
+      out.push({ type: "Malware Family", value: fam, source: "AlienVault OTX", risk: "high" });
+    for (const actor of otx.raw?.threat_actors || [])
+      out.push({ type: "Threat Actor", value: actor, source: "AlienVault OTX", risk: "high" });
+  }
+
+  // ── GreyNoise ─────────────────────────────────────────────────────────
+  const gn = result.greynoise;
+  if (gn?.status === "success") {
+    const r = gn.raw || {};
+    if (r.riot)
+      out.push({ type: "Known Service", value: r.name || "Benign service (RIOT)", source: "GreyNoise", risk: "low" });
+    else if (r.noise)
+      out.push({ type: "Mass Scanner", value: r.classification || "unclassified", source: "GreyNoise", risk: riskLevel(gn.verdict, gn.confidence) });
+  }
+
+  // ── AbuseIPDB ─────────────────────────────────────────────────────────
+  const abuse = result.abuseipdb;
+  if (abuse?.status === "success" && (abuse.raw?.abuseConfidenceScore || 0) > 0) {
+    out.push({
+      type: "Abuse Report",
+      value: `Score ${abuse.raw.abuseConfidenceScore}/100 · ${abuse.raw.totalReports} report(s)`,
+      source: "AbuseIPDB",
+      risk: riskLevel(abuse.verdict, abuse.confidence),
+    });
+  }
+
+  // ── Shodan ────────────────────────────────────────────────────────────
+  const shodan = result.shodan;
+  if (shodan?.status === "success") {
+    for (const cve of shodan.raw?.vulns || [])
+      out.push({ type: "CVE", value: cve, source: "Shodan", risk: "high" });
+    const ports = shodan.raw?.ports || [];
+    if (ports.length > 0)
+      out.push({
+        type: "Open Ports",
+        value: ports.slice(0, 10).join(", ") + (ports.length > 10 ? " …" : ""),
+        source: "Shodan",
+        risk: (shodan.raw?.vulns || []).length > 0 ? "medium" : "low",
+      });
+  }
+
+  // ── VirusTotal Passive DNS ────────────────────────────────────────────
+  for (const entry of (result.vt_passive_dns?.raw?.passive_dns || []).slice(0, 5)) {
+    out.push({
+      type: entry.type === "communicating_file" ? "Communicating File"
+           : entry.type === "referrer_file"     ? "Referrer File"
+           : "Passive DNS",
+      value: `${entry.hostname} · ${entry.date}`,
+      source: "VirusTotal",
+      risk: entry.type === "communicating_file" ? "medium" : "low",
+    });
+  }
+
+  // ── MalwareBazaar ─────────────────────────────────────────────────────
+  const mb = result.malwarebazaar;
+  if (mb?.status === "success") {
+    const tags = (mb.raw?.tags || []).slice(0, 5).join(", ");
+    out.push({
+      type: "Malware Sample",
+      value: [mb.raw?.signature, mb.raw?.file_type, tags].filter(Boolean).join(" · "),
+      source: "MalwareBazaar",
+      risk: "critical",
+    });
+  }
+
+  // ── URLhaus ───────────────────────────────────────────────────────────
+  const uh = result.urlhaus;
+  if (uh?.status === "success") {
+    const tags = (uh.raw?.tags || []).slice(0, 5).join(", ");
+    out.push({
+      type: (uh.raw?.active_count || 0) > 0 ? "Active Malicious URL" : "Malicious URL",
+      value: `${uh.raw?.url_count} URL(s)${tags ? " · " + tags : ""}`,
+      source: "URLhaus",
+      risk: uh.verdict === "malicious" && (uh.raw?.active_count || 0) > 0 ? "critical" : "high",
+    });
+  }
+
+  // ── GitHub ────────────────────────────────────────────────────────────
+  const gh = result.github;
+  if (gh?.status === "success" && (gh.raw?.relevant_count || 0) > 0) {
+    out.push({
+      type: "GitHub Mention",
+      value: `${gh.raw.relevant_count} relevant repo(s) of ${gh.raw.total_count} total`,
+      source: "GitHub",
+      risk: "low",
+    });
+  }
+
+  return out;
+}
+
 export default function OSINTDemo() {
   const [target, setTarget] = useState("");
   const [targetType, setTargetType] = useState("auto");
@@ -203,12 +319,36 @@ const exportJSON = () => {
 
     y += 4;
     addLine("AI REPORT", 13, true);
-    addLine(result.report || "No report generated.");
+    const rpt = result.report;
+    if (rpt && typeof rpt === "object") {
+      addLine(`Verdict: ${(rpt.verdict || "unknown").toUpperCase()} · Confidence: ${rpt.confidence || "—"} · TLP: ${rpt.tlp || "—"}`, 11, true);
+      if (rpt.summary) { y += 2; addLine(rpt.summary); }
+      if (rpt.key_findings?.length) {
+        y += 2; addLine("Key Findings:", 11, true);
+        rpt.key_findings.forEach(f => addLine(`  • ${f}`));
+      }
+      if (rpt.mitre_techniques?.length) {
+        y += 2; addLine("MITRE ATT&CK:", 11, true);
+        rpt.mitre_techniques.forEach(t =>
+          addLine(`  • ${typeof t === "object" ? `${t.technique_id}: ${t.technique_name}` : t}`)
+        );
+      }
+      if (rpt.recommended_actions?.length) {
+        y += 2; addLine("Recommended Actions:", 11, true);
+        rpt.recommended_actions.forEach(a => addLine(`  • ${a}`));
+      }
+      if (rpt.iocs_extracted?.length) {
+        y += 2; addLine("Extracted IOCs:", 11, true);
+        rpt.iocs_extracted.forEach(ioc => addLine(`  • ${ioc}`));
+      }
+    } else {
+      addLine(typeof rpt === "string" ? rpt : "No report generated.");
+    }
 
     y += 4;
     addLine("INDICATORS", 13, true);
-    (result.virustotal?.indicators || []).forEach(ind => {
-      addLine(`[${ind.risk?.toUpperCase()}] ${ind.type}: ${ind.value} (${ind.source})`);
+    buildIndicators(result).forEach(ind => {
+      addLine(`[${ind.risk.toUpperCase()}] ${ind.type}: ${ind.value} (${ind.source})`);
     });
 
     doc.save(`${target}-osint-report.pdf`);
@@ -479,29 +619,38 @@ const exportJSON = () => {
             )}
 
             {/* Indicators Tab */}
-            {activeTab === "indicators" && (
-              <div style={{ background: "#0d1017", border: "1px solid #ffffff10", borderRadius: "10px", overflow: "hidden" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                  <thead>
-                    <tr style={{ borderBottom: "1px solid #ffffff10" }}>
-                      {["Type", "Indicator", "Source", "Risk"].map(h => (
-                        <th key={h} style={{ padding: "12px 16px", textAlign: "left", color: "#555", fontSize: "11px", letterSpacing: "0.1em", fontWeight: 500 }}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(result.virustotal?.indicators || []).map((ind, i) => (
-                      <tr key={i} style={{ borderBottom: "1px solid #ffffff08" }}>
-                        <td style={{ padding: "12px 16px", color: "#888", fontSize: "12px", fontFamily: "'JetBrains Mono', monospace" }}>{ind.type}</td>
-                        <td style={{ padding: "12px 16px", color: "#e0e0e0", fontSize: "12px", fontFamily: "'JetBrains Mono', monospace" }}>{ind.value}</td>
-                        <td style={{ padding: "12px 16px", color: "#555", fontSize: "12px" }}>{ind.source}</td>
-                        <td style={{ padding: "12px 16px" }}><RiskBadge level={ind.risk} /></td>
+            {activeTab === "indicators" && (() => {
+              const indicators = buildIndicators(result);
+              return (
+                <div style={{ background: "#0d1017", border: "1px solid #ffffff10", borderRadius: "10px", overflow: "hidden" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                    <thead>
+                      <tr style={{ borderBottom: "1px solid #ffffff10" }}>
+                        {["Type", "Indicator", "Source", "Risk"].map(h => (
+                          <th key={h} style={{ padding: "12px 16px", textAlign: "left", color: "#555", fontSize: "11px", letterSpacing: "0.1em", fontWeight: 500 }}>{h}</th>
+                        ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                    </thead>
+                    <tbody>
+                      {indicators.length === 0 ? (
+                        <tr>
+                          <td colSpan={4} style={{ padding: "32px 16px", textAlign: "center", color: "#333", fontSize: "13px", fontFamily: "'JetBrains Mono', monospace" }}>
+                            No indicators extracted — all sources returned no data or not applicable
+                          </td>
+                        </tr>
+                      ) : indicators.map((ind, i) => (
+                        <tr key={i} style={{ borderBottom: "1px solid #ffffff08" }}>
+                          <td style={{ padding: "12px 16px", color: "#888", fontSize: "12px", fontFamily: "'JetBrains Mono', monospace" }}>{ind.type}</td>
+                          <td style={{ padding: "12px 16px", color: "#e0e0e0", fontSize: "12px", fontFamily: "'JetBrains Mono', monospace", wordBreak: "break-all" }}>{ind.value}</td>
+                          <td style={{ padding: "12px 16px", color: "#555", fontSize: "12px", whiteSpace: "nowrap" }}>{ind.source}</td>
+                          <td style={{ padding: "12px 16px" }}><RiskBadge level={ind.risk} /></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              );
+            })()}
 
             {/* Sources Tab */}
             {activeTab === "sources" && (
