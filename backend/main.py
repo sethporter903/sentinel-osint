@@ -19,6 +19,7 @@ from fetchers import (
     generate_ioc_report,
     detect_input_type,
 )
+from fetch_threatfox import fetch_threatfox
 
 load_dotenv()
 
@@ -54,6 +55,7 @@ async def _analyze_target(target: str) -> dict:
         circl_data,
         vt_pdns_data,
         github_data,
+        threatfox_data,
     ) = await asyncio.gather(
         fetch_whois(target),
         fetch_otx(target),
@@ -65,6 +67,7 @@ async def _analyze_target(target: str) -> dict:
         fetch_circl_pdns(target),
         fetch_vt_passive_dns(target),
         fetch_github(target),
+        fetch_threatfox(target),
     )
 
     all_sources = {
@@ -78,6 +81,7 @@ async def _analyze_target(target: str) -> dict:
         "circl_pdns": circl_data,
         "vt_passive_dns": vt_pdns_data,
         "github": github_data,
+        "threatfox": threatfox_data,
     }
 
     relevant_sources = {

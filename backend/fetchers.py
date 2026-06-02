@@ -264,7 +264,7 @@ async def fetch_abuseipdb(target: str) -> dict:
         "Key": ABUSEIPDB_API_KEY or "",
         "Accept": "application/json",
     }
-    params = {"ipAddress": target, "maxAgeInDays": 90}
+    params = {"ipAddress": target, "maxAgeInDays": 365}
 
     try:
         async with httpx.AsyncClient() as client:
@@ -769,10 +769,13 @@ async def fetch_vt_passive_dns(target: str) -> dict:
     try:
         async with httpx.AsyncClient() as client:
             resp = await client.get(
-                res_url, headers=headers, params={"limit": 20}, timeout=10
+                res_url, headers=headers, params={"limit": 40}, timeout=10
             )
             resp.raise_for_status()
             res_data = resp.json()
+
+        # Total records VT holds for this target (may be far larger than our page)
+        api_total = res_data.get("meta", {}).get("count")
 
         for item in res_data.get("data", []):
             attrs = item.get("attributes", {})
@@ -855,6 +858,7 @@ async def fetch_vt_passive_dns(target: str) -> dict:
                 "passive_dns": passive_dns,
                 "fallback_used": fallback_used,
                 "total_returned": len(passive_dns),
+                "api_total": api_total,
             },
         }
 
@@ -1052,7 +1056,7 @@ Weigh sources in this order when signals conflict:
 3. AbuseIPDB reports with detailed category annotations
 4. Shodan host data with CVE matches and exposed service fingerprints
 5. GreyNoise classification with context
-6. OTX pulse associations with named threat actors
+6. OTX pulse associations and ThreatFox IOC database entries
 7. Community reports and single-source flags (lowest)
 
 ## Interpretation Rules
@@ -1095,6 +1099,13 @@ Weigh sources in this order when signals conflict:
 - Pulse count above 5 from independent researchers significantly raises confidence
 - Named threat actor associations should always surface in key_findings even if other signals are weak
 - Malware family associations should map directly to MITRE ATT&CK techniques
+
+**ThreatFox:**
+- confidence_level is a percentage: 75+ = high confidence confirmed IOC, 50-74 = medium, below 50 = unverified community report
+- threat_type fields like "botnet_cc" (C2), "payload_delivery", "phishing" map directly to MITRE techniques — always surface the threat_type in key_findings
+- If ThreatFox and OTX both flag the same target with overlapping malware families, treat this as strong corroboration and raise confidence one level
+- A ThreatFox hit with confidence_level >= 75 and a named malware family is sufficient on its own to recommend immediate blocking, even if other sources are inconclusive
+- ioc_count > 1 means the target appears in multiple independent reports — weight this similarly to a multi-source flag
 
 **GitHub:**
 - Results have already been filtered for relevance — only repositories where the target appears in a meaningful context (not proxy lists or IP dumps) are included; relevant_count tells you how many passed

@@ -214,6 +214,23 @@ function buildIndicators(result) {
     });
   }
 
+  // ── ThreatFox ─────────────────────────────────────────────────────────
+  const tf = result.threatfox;
+  if (tf?.status === "success") {
+    for (const ioc of (tf.raw?.iocs || []).slice(0, 5)) {
+      const label = [
+        ioc.malware_printable || ioc.malware,
+        ioc.threat_type_desc || ioc.threat_type,
+      ].filter(Boolean).join(" · ");
+      out.push({
+        type: "ThreatFox IOC",
+        value: `${ioc.ioc}${label ? " — " + label : ""} (${tf.raw.max_confidence_level}% confidence)`,
+        source: "ThreatFox",
+        risk: riskLevel(tf.verdict, tf.confidence),
+      });
+    }
+  }
+
   // ── GitHub ────────────────────────────────────────────────────────────
   const gh = result.github;
   if (gh?.status === "success" && (gh.raw?.relevant_count || 0) > 0) {
@@ -564,7 +581,12 @@ const exportJSON = () => {
             {activeTab === "summary" && (
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                 <div style={{ background: "#0d1017", border: "1px solid #ffffff10", borderRadius: "10px", padding: "20px" }}>
-                  <div style={{ color: "#555", fontSize: "11px", letterSpacing: "0.1em", marginBottom: "14px" }}>WHOIS DATA</div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+                    <div style={{ color: "#555", fontSize: "11px", letterSpacing: "0.1em" }}>WHOIS DATA</div>
+                    <a href={`https://who.is/whois/${target}`} target="_blank" rel="noreferrer" className="ext-link" style={{ fontSize: "10px" }}>
+                      ↗ who.is
+                    </a>
+                  </div>
                   {Object.entries(result.whois).map(([k, v]) => (
                     <div key={k} style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px", gap: "12px" }}>
                       <span style={{ color: "#555", fontSize: "12px", fontFamily: "'JetBrains Mono', monospace", minWidth: 100 }}>{k}</span>
@@ -653,28 +675,155 @@ const exportJSON = () => {
             })()}
 
             {/* Sources Tab */}
-            {activeTab === "sources" && (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px" }}>
-                {[
-                  { name: "WHOIS", status: "success", records: 7, icon: "🔍" },
-                  { name: "Passive DNS", status: "success", records: 3, icon: "🌐" },
-                  { name: "GitHub", status: (result.github?.raw?.relevant_count || 0) > 0 ? "success" : "empty", records: result.github?.raw?.relevant_count || 0, icon: "💻" },
-                  { name: "OTX", status: (result.otx?.raw?.pulse_count || 0) > 0 ? "success" : "empty", records: result.otx?.raw?.pulse_count || 0, icon: "🎯" },
-                  { name: "AbuseIPDB", status: "success", records: 2, icon: "🛡️" },
-                  { name: "VirusTotal", status: "partial", records: 1, icon: "🔬" },
-                ].map(s => (
-                  <div key={s.name} style={{
-                    background: "#0d1017", border: "1px solid #ffffff10", borderRadius: "10px", padding: "16px",
-                  }}>
-                    <div style={{ fontSize: "20px", marginBottom: "8px" }}>{s.icon}</div>
-                    <div style={{ color: "#fff", fontWeight: 600, fontSize: "14px", marginBottom: "4px" }}>{s.name}</div>
-                    <div style={{ color: s.status === "success" ? "#00e676" : s.status === "empty" ? "#555" : "#ffd700", fontSize: "12px" }}>
-                      {s.status === "success" ? `${s.records} records` : s.status === "empty" ? "No data" : "Partial"}
+            {activeTab === "sources" && (() => {
+              const tgt = target;
+              const isIp = result.input_type === "ip";
+              const otxType = isIp ? "ip" : "domain";
+              const vtType  = isIp ? "ip-address" : "domain";
+
+              // Genuine pDNS resolutions only — exclude communicating/referrer file fallbacks
+              const pdnsHostnames = (result.vt_passive_dns?.raw?.passive_dns || [])
+                .filter(e => !e.type)
+                .slice(0, 5);
+
+              const sources = [
+                {
+                  name: "WHOIS", icon: "🔍",
+                  status: Object.keys(result.whois || {}).some(k => k !== "error") ? "success" : "empty",
+                  records: 1,
+                  label: "registration",
+                  url: `https://who.is/whois/${tgt}`,
+                  urlLabel: "who.is",
+                },
+                {
+                  name: "CIRCL pDNS", icon: "🌐",
+                  status: result.circl_pdns?.status === "success" ? "success" : "empty",
+                  records: result.circl_pdns?.raw?.record_count || 0,
+                  url: null,
+                },
+                {
+                  name: "VT Passive DNS", icon: "🔬",
+                  status: result.vt_passive_dns?.status === "success" ? "success" : "empty",
+                  records: result.vt_passive_dns?.raw?.api_total
+                           ?? result.vt_passive_dns?.raw?.total_returned
+                           ?? 0,
+                  label: "resolution",
+                  sublabel: (() => {
+                    const total = result.vt_passive_dns?.raw?.api_total;
+                    const shown = result.vt_passive_dns?.raw?.total_returned || 0;
+                    return total > shown ? `showing ${shown} most recent` : null;
+                  })(),
+                  url: `https://www.virustotal.com/gui/${vtType}/${tgt}`,
+                  urlLabel: "virustotal.com",
+                  hostnameList: pdnsHostnames,
+                },
+                {
+                  name: "OTX", icon: "🎯",
+                  status: (result.otx?.raw?.pulse_count || 0) > 0 ? "success" : "empty",
+                  records: result.otx?.raw?.pulse_count || 0,
+                  url: `https://otx.alienvault.com/indicator/${otxType}/${tgt}`,
+                  urlLabel: "otx.alienvault.com",
+                },
+                {
+                  name: "ThreatFox", icon: "🦊",
+                  status: (result.threatfox?.raw?.ioc_count || 0) > 0 ? "success" : "empty",
+                  records: result.threatfox?.raw?.ioc_count || 0,
+                  label: "IOC",
+                  url: result.threatfox?.raw?.iocs?.[0]?.id
+                       ? `https://threatfox.abuse.ch/ioc/${result.threatfox.raw.iocs[0].id}`
+                       : null,
+                  urlLabel: "threatfox.abuse.ch",
+                },
+                {
+                  name: "GreyNoise", icon: "📡",
+                  status: result.greynoise?.status === "success" && result.greynoise?.verdict !== "unknown" ? "success" : "empty",
+                  records: result.greynoise?.status === "success" && result.greynoise?.verdict !== "unknown" ? 1 : 0,
+                  url: isIp ? `https://viz.greynoise.io/ip/${tgt}` : null,
+                  urlLabel: "viz.greynoise.io",
+                },
+                {
+                  name: "AbuseIPDB", icon: "🛡️",
+                  status: result.abuseipdb?.status === "success" ? "success" : "empty",
+                  records: result.abuseipdb?.raw?.totalReports ?? 0,
+                  label: "report",
+                  zeroLabel: "0 reports (clean)",
+                  url: isIp ? `https://www.abuseipdb.com/check/${tgt}` : null,
+                  urlLabel: "abuseipdb.com",
+                },
+                {
+                  name: "Shodan", icon: "🔭",
+                  status: result.shodan?.status === "success" ? "success" : "empty",
+                  records: (result.shodan?.raw?.ports || []).length,
+                  url: isIp ? `https://www.shodan.io/host/${tgt}` : null,
+                  urlLabel: "shodan.io",
+                },
+                {
+                  name: "GitHub", icon: "💻",
+                  status: (result.github?.raw?.total_count || 0) > 0 ? "success" : "empty",
+                  records: result.github?.raw?.total_count || 0,
+                  label: "repo",
+                  sublabel: (() => {
+                    const rel = result.github?.raw?.relevant_count || 0;
+                    const flt = result.github?.raw?.filtered_count || 0;
+                    if (rel > 0) return `${rel} relevant, ${flt} filtered`;
+                    if (flt > 0) return `all ${flt} filtered as noise`;
+                    return null;
+                  })(),
+                  url: `https://github.com/search?q=${encodeURIComponent(tgt)}&type=repositories`,
+                  urlLabel: "github.com",
+                },
+              ];
+
+              return (
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px", alignItems: "start" }}>
+                  {sources.map(s => (
+                    <div key={s.name} style={{
+                      background: "#0d1017", border: "1px solid #ffffff10", borderRadius: "10px", padding: "16px",
+                    }}>
+                      <div style={{ fontSize: "20px", marginBottom: "8px" }}>{s.icon}</div>
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
+                        <div style={{ color: "#fff", fontWeight: 600, fontSize: "14px" }}>{s.name}</div>
+                        {s.url && (
+                          <a href={s.url} target="_blank" rel="noreferrer"
+                            className="ext-link"
+                            title={`View on ${s.urlLabel || s.name}`}
+                            style={{ fontSize: "20px", lineHeight: 1, padding: "2px 6px", marginLeft: "2px" }}>
+                            ↗
+                          </a>
+                        )}
+                      </div>
+                      <div style={{ color: s.status === "success" ? "#00e676" : s.status === "empty" ? "#555" : "#ffd700", fontSize: "12px" }}>
+                        {s.status === "success"
+                          ? (s.records === 0 && s.zeroLabel
+                              ? s.zeroLabel
+                              : `${s.records} ${(s.label || "record") + (s.records !== 1 ? "s" : "")}`)
+                          : s.status === "empty" ? "No data" : "Partial"}
+                      </div>
+                      {s.sublabel && s.status === "success" && (
+                        <div style={{ color: "#444", fontSize: "10px", fontFamily: "'JetBrains Mono', monospace", marginTop: "3px" }}>
+                          {s.sublabel}
+                        </div>
+                      )}
+                      {/* Inline pDNS hostnames with individual VT links */}
+                      {s.hostnameList?.length > 0 && (
+                        <div style={{ marginTop: "10px", paddingTop: "10px", borderTop: "1px solid #ffffff08" }}>
+                          {s.hostnameList.map((e, i) => (
+                            <a key={i}
+                              href={`https://www.virustotal.com/gui/domain/${encodeURIComponent(e.hostname)}`}
+                              target="_blank" rel="noreferrer"
+                              className="ext-link"
+                              style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", marginBottom: "5px" }}>
+                              <span style={{ wordBreak: "break-all" }}>{e.hostname}</span>
+                              <span style={{ color: "#333", marginLeft: "6px", flexShrink: 0 }}>{e.date}</span>
+                            </a>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              );
+            })()}
 
             {/* Report Tab */}
             {activeTab === "report" && (
@@ -743,6 +892,8 @@ const exportJSON = () => {
         input::placeholder { color: #333; }
         select option { background: #0d1017; }
         button:hover { opacity: 0.85; }
+        .ext-link { color: #ffffff50; text-decoration: none; transition: color 0.15s; }
+        .ext-link:hover { color: #00e5ff; }
       `}</style>
     </div>
   );
