@@ -1,0 +1,156 @@
+{
+  "target": "44d88612fea8a8f36de82e1278abb02f",
+  "input_type": "md5",
+  "whois": {
+    "error": "WHOIS lookup is not applicable for file hashes."
+  },
+  "otx": {
+    "source": "otx",
+    "status": "success",
+    "verdict": "suspicious",
+    "confidence": "low",
+    "summary": "Found in 3 OTX pulse(s).",
+    "raw": {
+      "pulse_count": 3,
+      "malware_families": ["EICAR"],
+      "threat_actors": [],
+      "reputation": 0,
+      "indicator": "44d88612fea8a8f36de82e1278abb02f"
+    }
+  },
+  "greynoise": {
+    "source": "greynoise",
+    "status": "not_applicable",
+    "verdict": "unknown",
+    "confidence": "low",
+    "summary": "GreyNoise only supports IP addresses.",
+    "raw": {}
+  },
+  "abuseipdb": {
+    "source": "abuseipdb",
+    "status": "not_applicable",
+    "verdict": "unknown",
+    "confidence": "low",
+    "summary": "AbuseIPDB only supports IP addresses.",
+    "raw": {}
+  },
+  "shodan": {
+    "source": "shodan",
+    "status": "not_applicable",
+    "verdict": "unknown",
+    "confidence": "low",
+    "summary": "Shodan host lookup only supports IP addresses.",
+    "raw": {}
+  },
+  "malwarebazaar": {
+    "source": "malwarebazaar",
+    "status": "success",
+    "verdict": "malicious",
+    "confidence": "high",
+    "summary": "Known malware: EICAR Test File (Win32 EXE), tags: eicar, test, antivirus.",
+    "raw": {
+      "sha256": "275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f",
+      "md5": "44d88612fea8a8f36de82e1278abb02f",
+      "file_type": "Win32 EXE",
+      "signature": "EICAR Test File",
+      "tags": ["eicar", "test", "antivirus"],
+      "first_seen": "2020-08-11"
+    }
+  },
+  "urlhaus": {
+    "source": "urlhaus",
+    "status": "not_applicable",
+    "verdict": "unknown",
+    "confidence": "low",
+    "summary": "URLhaus only supports URLs and domains.",
+    "raw": {}
+  },
+  "circl_pdns": {
+    "source": "circl_pdns",
+    "status": "not_applicable",
+    "verdict": "unknown",
+    "confidence": "low",
+    "summary": "CIRCL pDNS only supports domains and IPs.",
+    "raw": {}
+  },
+  "vt_passive_dns": {
+    "source": "vt_passive_dns",
+    "status": "not_applicable",
+    "verdict": "unknown",
+    "confidence": "low",
+    "summary": "VT passive DNS only supports IPs and domains.",
+    "raw": {"passive_dns": []}
+  },
+  "github": {
+    "source": "github",
+    "status": "success",
+    "verdict": "unknown",
+    "confidence": "low",
+    "summary": "GitHub: 5 relevant result(s) out of 214 total (209 filtered as proxy lists or dumps).",
+    "raw": {
+      "total_count": 214,
+      "relevant_count": 5,
+      "filtered_count": 209,
+      "repos": [
+        {
+          "name": "ytdl-org/youtube-dl",
+          "description": "youtube-dl test suite references the EICAR hash 44d88612... as a known antivirus test vector.",
+          "url": "https://github.com/ytdl-org/youtube-dl",
+          "stars": 132000,
+          "updated": "2024-10-20T00:00:00Z",
+          "topics": ["python", "testing"],
+          "relevant": true
+        },
+        {
+          "name": "cuckoosandbox/cuckoo",
+          "description": "Cuckoo sandbox uses EICAR test file (44d88612fea8a8f36de82e1278abb02f) for integration testing of AV detection pipelines.",
+          "url": "https://github.com/cuckoosandbox/cuckoo",
+          "stars": 5441,
+          "updated": "2024-09-15T00:00:00Z",
+          "topics": ["malware-analysis", "sandbox", "security"],
+          "relevant": true
+        },
+        {
+          "name": "VirusTotal/vt-py",
+          "description": "VirusTotal Python library — uses EICAR MD5 in unit tests to validate hash submission and lookup workflows.",
+          "url": "https://github.com/VirusTotal/vt-py",
+          "stars": 487,
+          "updated": "2024-11-01T00:00:00Z",
+          "topics": ["virustotal", "threat-intel"],
+          "relevant": true
+        }
+      ]
+    }
+  },
+  "threatfox": {
+    "source": "threatfox",
+    "status": "not_applicable",
+    "verdict": "unknown",
+    "confidence": "low",
+    "summary": "ThreatFox lookup supports IPs and domains only.",
+    "raw": {}
+  },
+  "report": {
+    "verdict": "benign",
+    "confidence": "high",
+    "summary": "44d88612fea8a8f36de82e1278abb02f is the MD5 hash of the EICAR antivirus test file — a standardised, harmless 68-byte string that every antivirus engine is required to detect, used globally to verify that AV software is functioning correctly. While MalwareBazaar classifies it as a known file and AV engines flag it as 'malicious', this is by design and reflects the test file's purpose, not actual malicious intent. Encountering this hash in your environment most likely indicates AV software testing, security tooling validation, or developer unit tests — not an actual infection.",
+    "key_findings": [
+      "MalwareBazaar identifies this as the EICAR standard antivirus test file — not real malware, but a harmless 68-byte compliance test string",
+      "All network-based sources (GreyNoise, AbuseIPDB, Shodan, CIRCL pDNS, VT Passive DNS) return not_applicable — there are no network IOCs associated with this hash",
+      "3 OTX pulses are research/educational entries documenting the EICAR test file, not incident reports",
+      "GitHub: 214 repositories reference this hash, predominantly in security tools, test suites, and AV validation frameworks",
+      "The SHA256 (275a021b...) and SHA1 (3395856c...) are equally well-known test vectors — their presence in any threat feed is expected and benign"
+    ],
+    "mitre_techniques": [],
+    "recommended_actions": [
+      "No action required — EICAR is a harmless test file by design",
+      "If this hash appeared in a security alert, verify your AV/EDR is configured to suppress EICAR detections in known testing contexts",
+      "If you are unsure why this hash appeared in your environment, check which process created or downloaded the file — this may reveal a misconfigured security tool or developer testing"
+    ],
+    "iocs_extracted": [
+      "275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f"
+    ],
+    "tlp": "WHITE"
+  },
+  "riskScore": 18
+}

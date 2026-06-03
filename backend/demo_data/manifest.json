@@ -1,0 +1,26 @@
+[
+  {
+    "target": "185.220.101.45",
+    "label": "Tor Exit Node",
+    "type": "ip",
+    "verdict": "malicious"
+  },
+  {
+    "target": "malware-c2.example",
+    "label": "C2 Domain",
+    "type": "domain",
+    "verdict": "malicious"
+  },
+  {
+    "target": "8.8.8.8",
+    "label": "Google DNS",
+    "type": "ip",
+    "verdict": "benign"
+  },
+  {
+    "target": "44d88612fea8a8f36de82e1278abb02f",
+    "label": "EICAR Test File",
+    "type": "md5",
+    "verdict": "malicious"
+  }
+]

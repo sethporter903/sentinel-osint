@@ -1,7 +1,10 @@
 import os
+import json
 import asyncio
-from fastapi import FastAPI, Query
+from pathlib import Path
+from fastapi import FastAPI, APIRouter, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import List
 from dotenv import load_dotenv
@@ -23,10 +26,51 @@ from fetch_threatfox import fetch_threatfox
 
 load_dotenv()
 
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+FRONTEND_URL  = os.getenv("FRONTEND_URL", "http://localhost:5173")
 SHODAN_API_KEY = os.getenv("SHODAN_API_KEY")
+DEMO_MODE     = os.getenv("DEMO_MODE", "false").lower() == "true"
 
-app = FastAPI(title="SentinelOSINT API", version="0.2.0")
+# ── Demo data ─────────────────────────────────────────────────────────────────
+# Load all cached result files from demo_data/ at startup.
+# The manifest.json drives the ordered list shown in the frontend.
+
+_DEMO_DIR = Path(__file__).parent / "demo_data"
+
+def _load_demo_data() -> tuple[dict, list]:
+    """Returns (cache_dict keyed by target, manifest_list)."""
+    cache: dict[str, dict] = {}
+    manifest: list[dict]   = []
+
+    if not _DEMO_DIR.exists():
+        return cache, manifest
+
+    # Load manifest for ordered display + labels
+    manifest_path = _DEMO_DIR / "manifest.json"
+    if manifest_path.exists():
+        with open(manifest_path, encoding="utf-8") as f:
+            manifest = json.load(f)
+
+    # Load each result file; filename stem == target string
+    for path in _DEMO_DIR.glob("*.json"):
+        if path.name == "manifest.json":
+            continue
+        try:
+            with open(path, encoding="utf-8") as f:
+                data = json.load(f)
+            target_key = path.stem.lower()
+            cache[target_key] = data
+        except Exception:
+            pass
+
+    return cache, manifest
+
+
+DEMO_CACHE, DEMO_MANIFEST = _load_demo_data()
+
+# ── App ───────────────────────────────────────────────────────────────────────
+
+app    = FastAPI(title="SentinelOSINT API", version="0.3.0")
+router = APIRouter()
 
 app.add_middleware(
     CORSMiddleware,
@@ -36,10 +80,17 @@ app.add_middleware(
 )
 
 
-@app.get("/")
+@router.get("/")
 async def root():
-    return {"status": "ok", "message": "SentinelOSINT API is running"}
+    return {
+        "status": "ok",
+        "message": "SentinelOSINT API is running",
+        "demo_mode": DEMO_MODE,
+        "demo_targets": DEMO_MANIFEST if DEMO_MODE else [],
+    }
 
+
+# ── Core analysis logic ───────────────────────────────────────────────────────
 
 async def _analyze_target(target: str) -> dict:
     input_type = detect_input_type(target)
@@ -99,11 +150,27 @@ async def _analyze_target(target: str) -> dict:
     }
 
 
-@app.get("/analyze")
+# ── Routes ────────────────────────────────────────────────────────────────────
+
+@router.get("/analyze")
 async def analyze(target: str = Query(..., description="Domain, IP, hash, or URL to analyze")):
     """
     Fan out to all IOC enrichment sources concurrently, then generate an LLM triage report.
+    In DEMO_MODE, returns pre-cached results instead of making live API calls.
     """
+    if DEMO_MODE:
+        cached = DEMO_CACHE.get(target.lower().strip())
+        if cached:
+            return cached
+        return {
+            "demo_error": True,
+            "message": (
+                "Demo mode is active — this target isn't in the pre-loaded example set. "
+                "Please select one of the available demo targets."
+            ),
+            "available_targets": [entry["target"] for entry in DEMO_MANIFEST],
+        }
+
     return await _analyze_target(target)
 
 
@@ -111,11 +178,23 @@ class BatchRequest(BaseModel):
     targets: List[str]
 
 
-@app.post("/analyze/batch")
+@router.post("/analyze/batch")
 async def analyze_batch(body: BatchRequest):
     """
     Analyze a list of IOCs concurrently, bounded to 10 in-flight requests at a time.
+    In DEMO_MODE, each target is served from cache (or returns a demo_error entry).
     """
+    if DEMO_MODE:
+        results = []
+        for t in body.targets:
+            cached = DEMO_CACHE.get(t.lower().strip())
+            results.append(cached if cached else {
+                "demo_error": True,
+                "target": t,
+                "message": "Target not available in demo mode.",
+            })
+        return results
+
     semaphore = asyncio.Semaphore(10)
 
     async def analyze_one(t: str) -> dict:
@@ -124,3 +203,17 @@ async def analyze_batch(body: BatchRequest):
 
     results = await asyncio.gather(*[analyze_one(t) for t in body.targets])
     return list(results)
+
+
+# ── Router mounts ─────────────────────────────────────────────────────────────
+# Include routes at root (for local dev — Vite proxy strips /api before hitting here)
+# and at /api (for production — frontend calls /api/... directly).
+app.include_router(router)
+app.include_router(router, prefix="/api")
+
+# ── Frontend static files (production only) ───────────────────────────────────
+# Serve the built React app from frontend/dist when it exists.
+# This catch-all must come AFTER all API route registrations.
+_FRONTEND_DIST = Path(__file__).parent.parent / "frontend" / "dist"
+if _FRONTEND_DIST.exists():
+    app.mount("/", StaticFiles(directory=str(_FRONTEND_DIST), html=True), name="frontend")

@@ -1,6 +1,7 @@
 fastapi
-uvicorn
+uvicorn[standard]
 httpx
 python-whois
 python-dotenv
 pydantic
+aiofiles

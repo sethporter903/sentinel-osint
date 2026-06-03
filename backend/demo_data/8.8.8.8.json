@@ -1,0 +1,174 @@
+{
+  "target": "8.8.8.8",
+  "input_type": "ip",
+  "whois": {
+    "registrar": "ARIN",
+    "created": "1992-12-01",
+    "expires": "N/A",
+    "registrant": "Google LLC",
+    "country": "US",
+    "nameservers": []
+  },
+  "otx": {
+    "source": "otx",
+    "status": "success",
+    "verdict": "unknown",
+    "confidence": "low",
+    "summary": "Found in 2 OTX pulse(s).",
+    "raw": {
+      "pulse_count": 2,
+      "malware_families": [],
+      "threat_actors": [],
+      "reputation": 0,
+      "indicator": "8.8.8.8"
+    }
+  },
+  "greynoise": {
+    "source": "greynoise",
+    "status": "success",
+    "verdict": "benign",
+    "confidence": "high",
+    "summary": "IP belongs to known benign service (Google Public DNS) per GreyNoise RIOT.",
+    "raw": {
+      "ip": "8.8.8.8",
+      "noise": false,
+      "riot": true,
+      "classification": "benign",
+      "name": "Google Public DNS",
+      "link": "https://viz.greynoise.io/ip/8.8.8.8",
+      "last_seen": "2024-11-14",
+      "message": "This IP is commonly associated with Google Public DNS and is likely benign."
+    }
+  },
+  "abuseipdb": {
+    "source": "abuseipdb",
+    "status": "success",
+    "verdict": "benign",
+    "confidence": "medium",
+    "summary": "AbuseIPDB score 0/100 from 0 report(s); usage type: Content Delivery Network, ISP: Google LLC.",
+    "raw": {
+      "ipAddress": "8.8.8.8",
+      "isPublic": true,
+      "ipVersion": 4,
+      "isWhitelisted": false,
+      "abuseConfidenceScore": 0,
+      "countryCode": "US",
+      "usageType": "Content Delivery Network",
+      "isp": "Google LLC",
+      "domain": "google.com",
+      "hostnames": ["dns.google"],
+      "isTor": false,
+      "totalReports": 0,
+      "numDistinctUsers": 0,
+      "lastReportedAt": null
+    }
+  },
+  "shodan": {
+    "source": "shodan",
+    "status": "success",
+    "verdict": "unknown",
+    "confidence": "low",
+    "summary": "Host exposes 2 port(s) with no known CVEs in Shodan.",
+    "raw": {
+      "ports": [53, 443],
+      "services": [
+        {"port": 53,  "transport": "udp", "product": "Google Public DNS", "version": ""},
+        {"port": 443, "transport": "tcp", "product": "Google DNS-over-HTTPS", "version": ""}
+      ],
+      "vulns": [],
+      "hostnames": ["dns.google"],
+      "org": "Google LLC",
+      "country": "United States",
+      "last_update": "2024-11-12T10:00:00",
+      "tags": ["cdn", "self-signed"]
+    }
+  },
+  "malwarebazaar": {
+    "source": "malwarebazaar",
+    "status": "not_applicable",
+    "verdict": "unknown",
+    "confidence": "low",
+    "summary": "MalwareBazaar only supports file hashes (MD5, SHA1, SHA256).",
+    "raw": {}
+  },
+  "urlhaus": {
+    "source": "urlhaus",
+    "status": "not_applicable",
+    "verdict": "unknown",
+    "confidence": "low",
+    "summary": "URLhaus only supports URLs and domains.",
+    "raw": {}
+  },
+  "circl_pdns": {
+    "source": "circl_pdns",
+    "status": "success",
+    "verdict": "unknown",
+    "confidence": "low",
+    "summary": "Found 20 pDNS record(s): 18 unique resolution(s) across 20 name(s).",
+    "raw": {
+      "record_count": 20,
+      "records": [
+        {"rrname": "dns.google.",               "rdata": "8.8.8.8", "rrtype": "A", "time_first": "2018-05-01", "time_last": "2024-11-14"},
+        {"rrname": "google-public-dns-a.google.com.", "rdata": "8.8.8.8", "rrtype": "A", "time_first": "2010-03-15", "time_last": "2024-11-14"},
+        {"rrname": "8.8.8.8.in-addr.arpa.",    "rdata": "dns.google", "rrtype": "PTR", "time_first": "2018-10-01", "time_last": "2024-11-14"}
+      ]
+    }
+  },
+  "vt_passive_dns": {
+    "source": "vt_passive_dns",
+    "status": "success",
+    "verdict": "unknown",
+    "confidence": "low",
+    "summary": "VirusTotal passive DNS: 10 resolution(s) found.",
+    "raw": {
+      "passive_dns": [
+        {"hostname": "dns.google",               "date": "2024-11-14"},
+        {"hostname": "google-public-dns-a.google.com", "date": "2024-11-01"}
+      ],
+      "fallback_used": null,
+      "total_returned": 2,
+      "api_total": 312
+    }
+  },
+  "github": {
+    "source": "github",
+    "status": "success",
+    "verdict": "unknown",
+    "confidence": "low",
+    "summary": "GitHub returned 1843 result(s) but all 10 sampled were filtered as proxy lists or IP dumps — no meaningful security context found.",
+    "raw": {
+      "total_count": 1843,
+      "relevant_count": 0,
+      "filtered_count": 10,
+      "repos": []
+    }
+  },
+  "threatfox": {
+    "source": "threatfox",
+    "status": "not_found",
+    "verdict": "unknown",
+    "confidence": "low",
+    "summary": "No ThreatFox entries found for this target.",
+    "raw": {}
+  },
+  "report": {
+    "verdict": "benign",
+    "confidence": "high",
+    "summary": "8.8.8.8 is Google's primary public DNS resolver, one of the most recognizable and widely used IP addresses on the internet. GreyNoise RIOT — a curated list of known benign services — identifies it as Google Public DNS with high confidence. AbuseIPDB returns a score of 0 with no reports. The 2 low-confidence OTX pulses are contextual research entries rather than threat indicators. There is no basis for concern; if this IP is appearing in your logs, it indicates devices using Google's public DNS service.",
+    "key_findings": [
+      "GreyNoise RIOT=true: definitively identified as Google Public DNS — strongest possible benign signal in the dataset",
+      "AbuseIPDB: 0/100 score with zero reports across 365 days — no abuse history whatsoever",
+      "ThreatFox: no IOC entries found — not present in threat intelligence database",
+      "2 OTX pulses are research and reference entries, not threat intelligence flags",
+      "Registered to Google LLC since 1992 via ARIN — long-standing, stable, well-known infrastructure"
+    ],
+    "mitre_techniques": [],
+    "recommended_actions": [
+      "No action required — this IP represents normal DNS resolution traffic to Google's public resolver",
+      "If 8.8.8.8 is appearing unexpectedly in firewall logs, investigate whether internal devices are bypassing your corporate DNS server rather than treating this as a threat"
+    ],
+    "iocs_extracted": [],
+    "tlp": "WHITE"
+  },
+  "riskScore": 3
+}

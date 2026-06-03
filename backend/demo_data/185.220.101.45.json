@@ -1,0 +1,263 @@
+{
+  "target": "185.220.101.45",
+  "input_type": "ip",
+  "whois": {
+    "registrar": "RIPE NCC",
+    "created": "2019-03-12",
+    "expires": "N/A",
+    "registrant": "FranTech Solutions",
+    "country": "DE",
+    "nameservers": []
+  },
+  "otx": {
+    "source": "otx",
+    "status": "success",
+    "verdict": "malicious",
+    "confidence": "high",
+    "summary": "Found in 52 OTX pulse(s), malware: Mirai, Hajime, Mozi.",
+    "raw": {
+      "pulse_count": 52,
+      "malware_families": ["Mirai", "Hajime", "Mozi"],
+      "threat_actors": ["UNC2452"],
+      "reputation": -100,
+      "indicator": "185.220.101.45"
+    }
+  },
+  "greynoise": {
+    "source": "greynoise",
+    "status": "success",
+    "verdict": "malicious",
+    "confidence": "high",
+    "summary": "IP is a classified malicious mass-scanner per GreyNoise.",
+    "raw": {
+      "ip": "185.220.101.45",
+      "noise": true,
+      "riot": false,
+      "classification": "malicious",
+      "name": "unknown",
+      "link": "https://viz.greynoise.io/ip/185.220.101.45",
+      "last_seen": "2024-11-14",
+      "message": "This IP is commonly associated with malicious activity."
+    }
+  },
+  "abuseipdb": {
+    "source": "abuseipdb",
+    "status": "success",
+    "verdict": "malicious",
+    "confidence": "high",
+    "summary": "AbuseIPDB score 100/100 from 94 report(s); usage type: Tor Exit Node, ISP: FranTech Solutions.",
+    "raw": {
+      "ipAddress": "185.220.101.45",
+      "isPublic": true,
+      "ipVersion": 4,
+      "isWhitelisted": false,
+      "abuseConfidenceScore": 100,
+      "countryCode": "DE",
+      "usageType": "Tor Exit Node",
+      "isp": "FranTech Solutions",
+      "domain": "frantech.ca",
+      "hostnames": ["tor-exit-185-220-101-45.relaytwo.com"],
+      "isTor": true,
+      "totalReports": 94,
+      "numDistinctUsers": 31,
+      "lastReportedAt": "2024-11-14T18:32:00+00:00"
+    }
+  },
+  "shodan": {
+    "source": "shodan",
+    "status": "success",
+    "verdict": "suspicious",
+    "confidence": "medium",
+    "summary": "Host exposes 4 port(s) with no known CVEs in Shodan.",
+    "raw": {
+      "ports": [80, 443, 9001, 9030],
+      "services": [
+        {"port": 9001, "transport": "tcp", "product": "Tor", "version": "0.4.8"},
+        {"port": 9030, "transport": "tcp", "product": "Tor Directory", "version": "0.4.8"},
+        {"port": 80,   "transport": "tcp", "product": "nginx", "version": "1.18.0"},
+        {"port": 443,  "transport": "tcp", "product": "nginx", "version": "1.18.0"}
+      ],
+      "vulns": [],
+      "hostnames": ["tor-exit-185-220-101-45.relaytwo.com"],
+      "org": "FranTech Solutions",
+      "country": "Germany",
+      "last_update": "2024-11-10T04:22:00",
+      "tags": ["tor", "exit-node"]
+    }
+  },
+  "malwarebazaar": {
+    "source": "malwarebazaar",
+    "status": "not_applicable",
+    "verdict": "unknown",
+    "confidence": "low",
+    "summary": "MalwareBazaar only supports file hashes (MD5, SHA1, SHA256).",
+    "raw": {}
+  },
+  "urlhaus": {
+    "source": "urlhaus",
+    "status": "not_applicable",
+    "verdict": "unknown",
+    "confidence": "low",
+    "summary": "URLhaus only supports URLs and domains.",
+    "raw": {}
+  },
+  "circl_pdns": {
+    "source": "circl_pdns",
+    "status": "success",
+    "verdict": "unknown",
+    "confidence": "low",
+    "summary": "Found 14 pDNS record(s): 11 unique resolution(s) across 14 name(s).",
+    "raw": {
+      "record_count": 14,
+      "records": [
+        {"rrname": "tor-exit-185-220-101-45.relaytwo.com.", "rdata": "185.220.101.45", "rrtype": "A", "time_first": "2023-02-10", "time_last": "2024-11-01"},
+        {"rrname": "exit-node.anonymizer-network.net.",     "rdata": "185.220.101.45", "rrtype": "A", "time_first": "2023-07-14", "time_last": "2024-09-30"},
+        {"rrname": "relay45.torzero.org.",                  "rdata": "185.220.101.45", "rrtype": "A", "time_first": "2024-01-03", "time_last": "2024-11-05"}
+      ]
+    }
+  },
+  "vt_passive_dns": {
+    "source": "vt_passive_dns",
+    "status": "success",
+    "verdict": "unknown",
+    "confidence": "low",
+    "summary": "VirusTotal passive DNS: 10 resolution(s) found.",
+    "raw": {
+      "passive_dns": [
+        {"hostname": "tor-exit-185-220-101-45.relaytwo.com", "date": "2024-11-01"},
+        {"hostname": "exit-node.anonymizer-network.net",      "date": "2024-10-28"},
+        {"hostname": "relay45.torzero.org",                   "date": "2024-10-15"},
+        {"hostname": "185-220-101-45.static.frantech.ca",     "date": "2024-09-22"}
+      ],
+      "fallback_used": null,
+      "total_returned": 4,
+      "api_total": 47
+    }
+  },
+  "github": {
+    "source": "github",
+    "status": "success",
+    "verdict": "suspicious",
+    "confidence": "low",
+    "summary": "GitHub: 4 relevant result(s) out of 31 total (27 filtered as proxy lists or dumps).",
+    "raw": {
+      "total_count": 31,
+      "relevant_count": 4,
+      "filtered_count": 27,
+      "repos": [
+        {
+          "name": "stamparm/ipsum",
+          "description": "Daily feed of bad IPs with blacklist hit scores. 185.220.101.45 appears in 7+ threat feeds.",
+          "url": "https://github.com/stamparm/ipsum",
+          "stars": 5812,
+          "updated": "2024-11-14T00:00:00Z",
+          "topics": ["threat-intel", "blocklist", "tor"],
+          "relevant": true
+        },
+        {
+          "name": "firehol/blocklist-ipsets",
+          "description": "Aggregated blocklist of known bad IPs. This IP is listed in tor-exit-nodes and multiple abuse feeds.",
+          "url": "https://github.com/firehol/blocklist-ipsets",
+          "stars": 4341,
+          "updated": "2024-11-10T00:00:00Z",
+          "topics": ["blocklist", "security", "firewall"],
+          "relevant": true
+        },
+        {
+          "name": "SecOps-Institute/OSINT-IOC-Resources",
+          "description": "Curated IOC collection — includes 185.220.101.45 in Tor exit node C2 activity report.",
+          "url": "https://github.com/SecOps-Institute/OSINT-IOC-Resources",
+          "stars": 312,
+          "updated": "2024-10-22T00:00:00Z",
+          "topics": ["ioc", "osint", "threat-intel"],
+          "relevant": true
+        },
+        {
+          "name": "user/botnet-iocs-2024",
+          "description": "IOCs extracted from Mirai botnet campaign. 185.220.101.45:9001 acting as C2 relay.",
+          "url": "https://github.com/user/botnet-iocs-2024",
+          "stars": 47,
+          "updated": "2024-10-05T00:00:00Z",
+          "topics": ["mirai", "botnet", "c2"],
+          "relevant": true
+        }
+      ]
+    }
+  },
+  "threatfox": {
+    "source": "threatfox",
+    "status": "success",
+    "verdict": "malicious",
+    "confidence": "high",
+    "summary": "ThreatFox: 3 IOC entry/entries (max confidence 100%), malware: Mirai, Hajime.",
+    "raw": {
+      "ioc_count": 3,
+      "iocs": [
+        {
+          "id": "1138420",
+          "ioc": "185.220.101.45:9001",
+          "ioc_type": "ip:port",
+          "ioc_type_desc": "ip:port combination used for botnet C2",
+          "threat_type": "botnet_cc",
+          "threat_type_desc": "Botnet C2 server",
+          "malware": "elf.mirai",
+          "malware_printable": "Mirai",
+          "confidence_level": 100,
+          "first_seen": "2024-03-01 00:00:00 UTC",
+          "last_seen": "2024-11-10 00:00:00 UTC",
+          "tags": ["tor", "botnet", "mirai"],
+          "reporter": "abuse.ch"
+        },
+        {
+          "id": "1138421",
+          "ioc": "185.220.101.45:9030",
+          "ioc_type": "ip:port",
+          "threat_type": "botnet_cc",
+          "threat_type_desc": "Botnet C2 server",
+          "malware": "elf.hajime",
+          "malware_printable": "Hajime",
+          "confidence_level": 100,
+          "first_seen": "2024-03-01 00:00:00 UTC",
+          "last_seen": "2024-10-28 00:00:00 UTC",
+          "tags": ["tor", "botnet", "hajime"],
+          "reporter": "abuse.ch"
+        }
+      ],
+      "malware_families": ["Mirai", "Hajime"],
+      "threat_types": ["Botnet C2 server"],
+      "tags": ["tor", "botnet", "mirai", "hajime"],
+      "max_confidence_level": 100
+    }
+  },
+  "report": {
+    "verdict": "malicious",
+    "confidence": "high",
+    "summary": "185.220.101.45 is a confirmed Tor exit node actively used as botnet C2 infrastructure. All five applicable threat intelligence sources independently flag this IP: AbuseIPDB returns a perfect 100/100 score from 94 reports, ThreatFox attributes it to Mirai and Hajime botnets with 100% confidence, and GreyNoise classifies it as an active malicious mass-scanner. Any inbound or outbound connections to this IP in your environment should be treated as a confirmed incident until proven otherwise.",
+    "key_findings": [
+      "AbuseIPDB: 100/100 abuse score from 94 reports across 31 distinct reporters — highest possible confidence rating",
+      "ThreatFox: two confirmed C2 entries on ports 9001 and 9030, attributed to Mirai and Hajime botnets at 100% confidence",
+      "GreyNoise: classified malicious mass-scanner (noise=true, classification=malicious) — actively scanning the internet",
+      "Shodan: ports 9001/9030 confirm active Tor OR/Directory listener; nginx on 80/443 provides web cover",
+      "52 OTX pulses from independent researchers corroborate Mirai, Hajime, and Mozi malware family associations"
+    ],
+    "mitre_techniques": [
+      {"technique_id": "T1090.003", "technique_name": "Proxy: Multi-hop Proxy", "justification": "Tor exit node used to anonymize C2 communications between infected bots and operator"},
+      {"technique_id": "T1071.001", "technique_name": "Application Layer Protocol: Web Protocols", "justification": "nginx on 80/443 used to blend malicious traffic with legitimate web traffic"},
+      {"technique_id": "T1584.005", "technique_name": "Compromise Infrastructure: Botnet", "justification": "IP is confirmed Mirai botnet C2 relay as documented in ThreatFox and OTX"}
+    ],
+    "recommended_actions": [
+      "Block 185.220.101.45 at perimeter firewall immediately — no legitimate business communication requires a Tor exit node",
+      "Search SIEM for all outbound connections to 185.220.101.45 over the last 90 days, focusing on ports 9001 and 9030",
+      "If connections found: isolate the source endpoint and initiate incident response — potential Mirai/Hajime infection",
+      "Search EDR telemetry for Mirai/Hajime IoCs on any host that connected to this IP",
+      "Add to IDS/IPS watchlist and configure alerting for the full /24 subnet 185.220.101.0/24"
+    ],
+    "iocs_extracted": [
+      "185.220.101.45:9001",
+      "185.220.101.45:9030",
+      "tor-exit-185-220-101-45.relaytwo.com"
+    ],
+    "tlp": "AMBER"
+  },
+  "riskScore": 95
+}

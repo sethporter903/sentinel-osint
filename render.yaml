@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: sentinel-osint
+    env: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: DEMO_MODE
+        value: "true"
+    plan: free

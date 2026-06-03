@@ -253,9 +253,23 @@ export default function OSINTDemo() {
   const [currentStep, setCurrentStep] = useState(null);
   const [result, setResult] = useState(null);
   const [activeTab, setActiveTab] = useState("summary");
+  const [isDemoMode, setIsDemoMode] = useState(false);
+  const [demoTargetList, setDemoTargetList] = useState([]);
+  const [demoError, setDemoError] = useState(null);
   const logRef = useRef(null);
 
-  const demoTargets = Object.keys(DEMO_TARGETS);
+  // Fetch backend config once on mount to determine demo mode
+  useEffect(() => {
+    fetch("/api/")
+      .then(r => r.json())
+      .then(cfg => {
+        if (cfg.demo_mode) {
+          setIsDemoMode(true);
+          setDemoTargetList(cfg.demo_targets || []);
+        }
+      })
+      .catch(() => {}); // fail silently — live mode if backend unreachable
+  }, []);
 
 const runScan = async (t) => {
     const tgt = t || target.trim();
@@ -265,6 +279,7 @@ const runScan = async (t) => {
     setCurrentStep(null);
     setResult(null);
     setActiveTab("summary");
+    setDemoError(null);
 
     for (let i = 0; i < STEPS.length; i++) {
       const step = STEPS[i];
@@ -276,6 +291,12 @@ const runScan = async (t) => {
     try {
       const response = await fetch(`/api/analyze?target=${encodeURIComponent(tgt)}`);
       const data = await response.json();
+      if (data.demo_error) {
+        setDemoError(data.message);
+        setCurrentStep(null);
+        setPhase("idle");
+        return;
+      }
       setResult(data);
     } catch (err) {
       console.error("API error:", err);
@@ -295,6 +316,7 @@ const runScan = async (t) => {
     setCompletedSteps([]);
     setCurrentStep(null);
     setResult(null);
+    setDemoError(null);
   };
 const exportJSON = () => {
     const blob = new Blob([JSON.stringify(result, null, 2)], { type: "application/json" });
@@ -397,7 +419,7 @@ const exportJSON = () => {
               SENTINEL<span style={{ color: "#00e5ff" }}>OSINT</span>
             </div>
             <div style={{ fontSize: "11px", color: "#555", fontFamily: "'JetBrains Mono', monospace" }}>
-              v0.4.1 · demo mode
+              v0.4.1{isDemoMode ? " · demo mode" : ""}
             </div>
           </div>
         </div>
@@ -465,22 +487,48 @@ const exportJSON = () => {
             </button>
           </div>
 
-          {/* Demo targets */}
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <span style={{ color: "#444", fontSize: "12px", fontFamily: "'JetBrains Mono', monospace" }}>
-              demo:
-            </span>
-            {demoTargets.map(t => (
-              <button key={t} onClick={() => { setTarget(t); runScan(t); }} style={{
-                background: "#111418", border: "1px solid #ffffff10", borderRadius: "4px",
-                padding: "4px 10px", color: "#00e5ff", fontSize: "12px",
-                fontFamily: "'JetBrains Mono', monospace", cursor: "pointer",
-                transition: "border-color 0.2s",
+          {/* Demo mode banner + target chips */}
+          {isDemoMode && (
+            <div>
+              <div style={{
+                display: "flex", alignItems: "center", gap: "8px",
+                background: "#0d1a2d", border: "1px solid #00e5ff22",
+                borderRadius: "6px", padding: "8px 12px", marginBottom: "10px",
               }}>
-                {t}
-              </button>
-            ))}
-          </div>
+                <span style={{ color: "#00e5ff", fontSize: "11px", fontWeight: 600, fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.08em" }}>
+                  DEMO MODE
+                </span>
+                <span style={{ color: "#555", fontSize: "11px", fontFamily: "'JetBrains Mono', monospace" }}>
+                  — pre-loaded examples only
+                </span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                <span style={{ color: "#444", fontSize: "12px", fontFamily: "'JetBrains Mono', monospace" }}>
+                  try:
+                </span>
+                {demoTargetList.map(t => (
+                  <button
+                    key={t.target}
+                    onClick={() => { setTarget(t.target); runScan(t.target); }}
+                    title={t.target}
+                    style={{
+                      background: "#111418", border: "1px solid #ffffff10", borderRadius: "4px",
+                      padding: "4px 10px", color: "#00e5ff", fontSize: "12px",
+                      fontFamily: "'JetBrains Mono', monospace", cursor: "pointer",
+                      transition: "border-color 0.2s",
+                    }}
+                  >
+                    {t.label || t.target}
+                  </button>
+                ))}
+              </div>
+              {demoError && (
+                <div style={{ marginTop: "10px", color: "#ff8c42", fontSize: "12px", fontFamily: "'JetBrains Mono', monospace" }}>
+                  ⚠ {demoError}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Scanning Phase */}
@@ -537,7 +585,7 @@ const exportJSON = () => {
                   ANALYSIS COMPLETE · {new Date().toUTCString()}
                 </div>
                 <div style={{ color: "#fff", fontSize: "20px", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace" }}>
-                  {target || demoTargets[0]}
+                  {target || demoTargetList[0]?.target || ""}
                 </div>
               </div>
               <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
