@@ -889,26 +889,60 @@ const exportJSON = () => {
                 }}>
                   {typeof result.report === 'object' ? (
   <div>
+    {/* Verdict + confidence badge */}
     <div style={{ marginBottom: "16px" }}>
       <span style={{ color: result.report.verdict === "malicious" ? "#ff4444" : result.report.verdict === "suspicious" ? "#ffaa00" : "#00e5ff", fontWeight: "bold", textTransform: "uppercase", fontSize: "13px" }}>
         {result.report.verdict}
       </span>
       <span style={{ color: "#555", fontSize: "12px", marginLeft: "10px" }}>confidence: {result.report.confidence}</span>
     </div>
-    <p style={{ marginBottom: "20px" }}>{result.report.summary}</p>
+
+    {/* Summary */}
+    <p style={{ marginBottom: "24px" }}>{result.report.summary}</p>
+
+    {/* Supporting evidence */}
+    <div style={{ marginBottom: "20px" }}>
+      <div style={{ color: "#00e676", fontSize: "11px", letterSpacing: "0.08em", fontFamily: "'JetBrains Mono', monospace", marginBottom: "10px" }}>
+        SUPPORTING EVIDENCE
+      </div>
+      {(result.report.top_supporting_evidence || []).map((e, i) => (
+        <div key={i} style={{ marginBottom: "8px", paddingLeft: "12px", borderLeft: "2px solid #00e67655", color: "#ccc", fontSize: "13px" }}>• {e}</div>
+      ))}
+    </div>
+
+    {/* Conflicting evidence */}
+    <div style={{ marginBottom: "24px" }}>
+      <div style={{ color: "#ffd700", fontSize: "11px", letterSpacing: "0.08em", fontFamily: "'JetBrains Mono', monospace", marginBottom: "10px" }}>
+        CONFLICTING EVIDENCE
+      </div>
+      {(result.report.top_conflicting_evidence || []).length > 0
+        ? (result.report.top_conflicting_evidence).map((e, i) => (
+            <div key={i} style={{ marginBottom: "8px", paddingLeft: "12px", borderLeft: "2px solid #ffd70055", color: "#ccc", fontSize: "13px" }}>• {e}</div>
+          ))
+        : (
+            <div style={{ paddingLeft: "12px", borderLeft: "2px solid #ffd70022", color: "#444", fontSize: "12px", fontStyle: "italic" }}>
+              No conflicting signals identified
+            </div>
+          )
+      }
+    </div>
+
+    {/* Key findings */}
     {result.report.key_findings?.length > 0 && (
       <div style={{ marginBottom: "20px" }}>
-        <div style={{ color: "#00e5ff", fontSize: "12px", marginBottom: "10px" }}>KEY FINDINGS</div>
+        <div style={{ color: "#00e5ff", fontSize: "11px", letterSpacing: "0.08em", fontFamily: "'JetBrains Mono', monospace", marginBottom: "10px" }}>KEY FINDINGS</div>
         {result.report.key_findings.map((f, i) => (
-          <div key={i} style={{ marginBottom: "8px", paddingLeft: "12px", borderLeft: "2px solid #00e5ff44" }}>• {f}</div>
+          <div key={i} style={{ marginBottom: "8px", paddingLeft: "12px", borderLeft: "2px solid #00e5ff44", color: "#ccc", fontSize: "13px" }}>• {f}</div>
         ))}
       </div>
     )}
+
+    {/* Recommended actions */}
     {result.report.recommended_actions?.length > 0 && (
       <div>
-        <div style={{ color: "#00e5ff", fontSize: "12px", marginBottom: "10px" }}>RECOMMENDED ACTIONS</div>
+        <div style={{ color: "#00e5ff", fontSize: "11px", letterSpacing: "0.08em", fontFamily: "'JetBrains Mono', monospace", marginBottom: "10px" }}>RECOMMENDED ACTIONS</div>
         {result.report.recommended_actions.map((a, i) => (
-          <div key={i} style={{ marginBottom: "8px", paddingLeft: "12px", borderLeft: "2px solid #ffffff22" }}>• {a}</div>
+          <div key={i} style={{ marginBottom: "8px", paddingLeft: "12px", borderLeft: "2px solid #ffffff22", color: "#ccc", fontSize: "13px" }}>• {a}</div>
         ))}
       </div>
     )}

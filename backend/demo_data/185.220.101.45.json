@@ -257,7 +257,16 @@
       "185.220.101.45:9030",
       "tor-exit-185-220-101-45.relaytwo.com"
     ],
-    "tlp": "AMBER"
+    "tlp": "AMBER",
+    "top_supporting_evidence": [
+      "AbuseIPDB: 100/100 abuse confidence score from 94 reports across 31 distinct reporters — maximum possible rating",
+      "ThreatFox: two confirmed C2 entries on ports 9001 and 9030, attributed to Mirai and Hajime botnets at 100% confidence",
+      "GreyNoise: classified malicious mass-scanner (noise=true, classification=malicious) — actively scanning the internet"
+    ],
+    "top_conflicting_evidence": [
+      "Tor exit nodes are legitimately used by journalists, activists, and privacy-conscious users — malicious activity may originate from any Tor user, not necessarily the node operator",
+      "Shodan reports no CVEs on the host, and nginx on 80/443 is consistent with a legitimate relay operator running an informational page"
+    ]
   },
   "riskScore": 95
 }

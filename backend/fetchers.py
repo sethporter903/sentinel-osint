@@ -1148,6 +1148,8 @@ Tailor actions to the input type — IP actions differ from domain actions diffe
 - key_findings should be the 3-5 most analytically significant observations, not a list of every data point
 - iocs_extracted should include any additional IOCs found within the source data itself (associated domains, IPs, hashes mentioned in OTX pulses or AbuseIPDB reports)
 - If all sources return not_applicable or not_found, return verdict: unknown with a summary explaining insufficient data
+- top_supporting_evidence: the 2–3 signals that most strongly support your verdict. Be specific — cite source names and values (e.g. "AbuseIPDB: 100/100 confidence from 94 reports across 31 reporters"). Do not simply restate the verdict or repeat key_findings verbatim; focus on the raw evidence.
+- top_conflicting_evidence: 1–2 signals that genuinely contradict the verdict, introduce uncertainty, or make the case less clear-cut. For a malicious verdict, note any false-positive risk or ambiguity (e.g. shared hosting, Tor exit used by legitimate privacy tools, known test file). For a benign verdict, note anything mildly suspicious. You must actively look for these — do not default to an empty array just because the overall verdict seems obvious. Only return an empty array if, after a genuine search, there is truly nothing that could argue the other way.
 
 Return ONLY valid JSON matching this exact schema, no preamble, no markdown backticks:
 {
@@ -1158,7 +1160,9 @@ Return ONLY valid JSON matching this exact schema, no preamble, no markdown back
   "mitre_techniques": [{"technique_id": "T1583.001", "technique_name": "Acquire Infrastructure: Domains", "justification": "one sentence"}],
   "recommended_actions": ["specific action 1", "specific action 2"],
   "iocs_extracted": ["any additional IOCs found in the data"],
-  "tlp": "WHITE" | "GREEN" | "AMBER"
+  "tlp": "WHITE" | "GREEN" | "AMBER",
+  "top_supporting_evidence": ["strongest signal 1 with source and value", "strongest signal 2"],
+  "top_conflicting_evidence": ["signal that creates doubt or false-positive risk"] or []
 }"""
 
 
@@ -1182,7 +1186,7 @@ async def generate_ioc_report(target: str, input_type: str, source_results: dict
                 },
                 json={
                     "model": "claude-sonnet-4-5",
-                    "max_tokens": 1000,
+                    "max_tokens": 1400,
                     "system": _SYSTEM_PROMPT,
                     "messages": [{"role": "user", "content": user_message}],
                 },

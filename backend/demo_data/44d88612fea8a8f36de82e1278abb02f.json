@@ -150,7 +150,15 @@
     "iocs_extracted": [
       "275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f"
     ],
-    "tlp": "WHITE"
+    "tlp": "WHITE",
+    "top_supporting_evidence": [
+      "MalwareBazaar signature is 'EICAR Test File' — an internationally standardised test vector, not a real malware family",
+      "All 9 network-based sources (GreyNoise, AbuseIPDB, Shodan, pDNS, URLhaus) return not_applicable — a real malware sample would have network IOCs",
+      "214 GitHub repositories reference this hash, the vast majority in security tooling, AV test suites, and sandbox validation frameworks"
+    ],
+    "top_conflicting_evidence": [
+      "MalwareBazaar labels the file type as 'Win32 EXE', which is technically accurate for the EICAR format but could cause automated systems to treat this as a real executable threat without proper context"
+    ]
   },
   "riskScore": 18
 }

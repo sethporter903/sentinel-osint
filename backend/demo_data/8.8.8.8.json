@@ -168,7 +168,15 @@
       "If 8.8.8.8 is appearing unexpectedly in firewall logs, investigate whether internal devices are bypassing your corporate DNS server rather than treating this as a threat"
     ],
     "iocs_extracted": [],
-    "tlp": "WHITE"
+    "tlp": "WHITE",
+    "top_supporting_evidence": [
+      "GreyNoise RIOT=true: definitively identified as Google Public DNS — the strongest possible benign signal in the dataset",
+      "AbuseIPDB: 0/100 score with zero confirmed reports — no abuse history across the entire reporting period",
+      "ThreatFox: completely absent from threat intelligence database with no IOC entries whatsoever"
+    ],
+    "top_conflicting_evidence": [
+      "2 low-confidence OTX pulses exist for this IP; while both are clearly educational or reference entries, their presence means automated systems may flag this IP in broad IOC sweeps"
+    ]
   },
   "riskScore": 3
 }
