@@ -469,6 +469,7 @@ export default function OSINTDemo() {
   const [activeTab, setActiveTab] = useState("summary");
   const [isDemoMode, setIsDemoMode] = useState(false);
   const [demoTargetList, setDemoTargetList] = useState([]);
+  const [demoCampaignList, setDemoCampaignList] = useState([]);
   const [demoError, setDemoError] = useState(null);
   const [campaignMode, setCampaignMode] = useState(false);
   const [campaignText, setCampaignText] = useState("");
@@ -481,7 +482,9 @@ export default function OSINTDemo() {
       .then(cfg => {
         if (cfg.demo_mode) {
           setIsDemoMode(true);
-          setDemoTargetList(cfg.demo_targets || []);
+          const all = cfg.demo_targets || [];
+          setDemoTargetList(all.filter(t => t.type !== "campaign"));
+          setDemoCampaignList(all.filter(t => t.type === "campaign"));
         }
       })
       .catch(() => {}); // fail silently — live mode if backend unreachable
@@ -555,9 +558,11 @@ const runScan = async (t) => {
     setDemoError(null);
   };
 
-  const runCampaign = async () => {
-    const lines = campaignText.split("\n").map(l => l.trim()).filter(Boolean);
+  const runCampaign = async (overrideText) => {
+    const raw = overrideText !== undefined ? overrideText : campaignText;
+    const lines = raw.split("\n").map(l => l.trim()).filter(Boolean);
     if (lines.length === 0) return;
+    if (overrideText !== undefined) setCampaignText(overrideText);
 
     setPhase("scanning");
     setCompletedSteps([]);
@@ -590,8 +595,8 @@ const runScan = async (t) => {
       });
       clearTimeout(timeoutId);
       const data = await response.json();
-      if (data.error) {
-        setDemoError(data.error);
+      if (data.demo_error || data.error) {
+        setDemoError(data.message || data.error);
         setCurrentStep(null);
         setPhase("idle");
         return;
@@ -855,7 +860,7 @@ const exportJSON = () => {
 
           {/* Demo mode banner + target chips */}
           {isDemoMode && (
-            <div>
+            <div style={{ marginTop: campaignMode ? "12px" : "0" }}>
               <div style={{
                 display: "flex", alignItems: "center", gap: "8px",
                 background: "#0d1a2d", border: "1px solid #00e5ff22",
@@ -868,26 +873,56 @@ const exportJSON = () => {
                   — pre-loaded examples only
                 </span>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-                <span style={{ color: "#444", fontSize: "12px", fontFamily: "'JetBrains Mono', monospace" }}>
-                  try:
-                </span>
-                {demoTargetList.map(t => (
-                  <button
-                    key={t.target}
-                    onClick={() => { setTarget(t.target); runScan(t.target); }}
-                    title={t.target}
-                    style={{
-                      background: "#111418", border: "1px solid #ffffff10", borderRadius: "4px",
-                      padding: "4px 10px", color: "#00e5ff", fontSize: "12px",
-                      fontFamily: "'JetBrains Mono', monospace", cursor: "pointer",
-                      transition: "border-color 0.2s",
-                    }}
-                  >
-                    {t.label || t.target}
-                  </button>
-                ))}
-              </div>
+
+              {campaignMode ? (
+                /* Campaign demo chips */
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                  <span style={{ color: "#444", fontSize: "12px", fontFamily: "'JetBrains Mono', monospace" }}>
+                    try:
+                  </span>
+                  {demoCampaignList.map(c => {
+                    const text = (c.targets || []).join("\n");
+                    return (
+                      <button
+                        key={c.id || c.label}
+                        onClick={() => runCampaign(text)}
+                        title={(c.targets || []).join(", ")}
+                        style={{
+                          background: "#1a1020", border: "1px solid #7928ca44", borderRadius: "4px",
+                          padding: "4px 10px", color: "#b06dff", fontSize: "12px",
+                          fontFamily: "'JetBrains Mono', monospace", cursor: "pointer",
+                          transition: "border-color 0.2s",
+                        }}
+                      >
+                        {c.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                /* Single-target demo chips */
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                  <span style={{ color: "#444", fontSize: "12px", fontFamily: "'JetBrains Mono', monospace" }}>
+                    try:
+                  </span>
+                  {demoTargetList.map(t => (
+                    <button
+                      key={t.target}
+                      onClick={() => { setTarget(t.target); runScan(t.target); }}
+                      title={t.target}
+                      style={{
+                        background: "#111418", border: "1px solid #ffffff10", borderRadius: "4px",
+                        padding: "4px 10px", color: "#00e5ff", fontSize: "12px",
+                        fontFamily: "'JetBrains Mono', monospace", cursor: "pointer",
+                        transition: "border-color 0.2s",
+                      }}
+                    >
+                      {t.label || t.target}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               {demoError && (
                 <div style={{ marginTop: "10px", color: "#ff8c42", fontSize: "12px", fontFamily: "'JetBrains Mono', monospace" }}>
                   ⚠ {demoError}

@@ -22,5 +22,29 @@
     "label": "EICAR Test File",
     "type": "md5",
     "verdict": "malicious"
+  },
+  {
+    "id": "campaign_phishing_kit",
+    "label": "Banking Phishing Kit",
+    "type": "campaign",
+    "verdict": "coordinated_malicious",
+    "targets": [
+      "bankofamerica-secure-login.net",
+      "wellsfargo-account-alert.org",
+      "chase-security-verify.com",
+      "185.234.219.70"
+    ]
+  },
+  {
+    "id": "campaign_cobalt_strike",
+    "label": "Cobalt Strike C2 Cluster",
+    "type": "campaign",
+    "verdict": "coordinated_malicious",
+    "targets": [
+      "45.153.160.140",
+      "api-telemetry.update-svc.net",
+      "194.165.16.158",
+      "cdn-metrics.analytics-svc.com"
+    ]
   }
 ]

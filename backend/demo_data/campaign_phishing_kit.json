@@ -1,0 +1,532 @@
+{
+  "targets": [
+    "bankofamerica-secure-login.net",
+    "wellsfargo-account-alert.org",
+    "chase-security-verify.com",
+    "185.234.219.70"
+  ],
+  "individual_results": [
+    {
+      "target": "bankofamerica-secure-login.net",
+      "input_type": "domain",
+      "whois": {
+        "registrar": "Namecheap, Inc.",
+        "created": "2024-11-01",
+        "expires": "2025-11-01",
+        "registrant": "REDACTED FOR PRIVACY",
+        "country": "PA",
+        "nameservers": ["dns1.bullethost-ns.com", "dns2.bullethost-ns.com"]
+      },
+      "otx": {
+        "source": "otx", "status": "success", "verdict": "malicious", "confidence": "high",
+        "summary": "Found in 7 OTX pulse(s), tagged: phishing, banking, credential-harvest, BofA.",
+        "raw": {
+          "pulse_count": 7,
+          "malware_families": [],
+          "threat_actors": [],
+          "reputation": -80,
+          "indicator": "bankofamerica-secure-login.net"
+        }
+      },
+      "greynoise": {
+        "source": "greynoise", "status": "not_applicable", "verdict": "unknown", "confidence": "low",
+        "summary": "GreyNoise only supports IP address lookups.",
+        "raw": {}
+      },
+      "abuseipdb": {
+        "source": "abuseipdb", "status": "not_applicable", "verdict": "unknown", "confidence": "low",
+        "summary": "AbuseIPDB only supports IP address lookups.",
+        "raw": {}
+      },
+      "shodan": {
+        "source": "shodan", "status": "not_applicable", "verdict": "unknown", "confidence": "low",
+        "summary": "Shodan host data requires an IP address.",
+        "raw": {}
+      },
+      "malwarebazaar": {
+        "source": "malwarebazaar", "status": "not_applicable", "verdict": "unknown", "confidence": "low",
+        "summary": "MalwareBazaar only supports file hashes.",
+        "raw": {}
+      },
+      "urlhaus": {
+        "source": "urlhaus", "status": "success", "verdict": "malicious", "confidence": "high",
+        "summary": "URLhaus: 4 active malicious URL(s) — tags: phishing, banking, credential-harvest.",
+        "raw": {
+          "url_count": 4,
+          "active_count": 4,
+          "tags": ["phishing", "banking", "credential-harvest"],
+          "urls": [
+            {"url": "http://bankofamerica-secure-login.net/signin", "status": "online", "date_added": "2024-11-02"},
+            {"url": "http://bankofamerica-secure-login.net/verify", "status": "online", "date_added": "2024-11-02"},
+            {"url": "http://bankofamerica-secure-login.net/secure/login", "status": "online", "date_added": "2024-11-03"},
+            {"url": "http://bankofamerica-secure-login.net/account/confirm", "status": "online", "date_added": "2024-11-03"}
+          ]
+        }
+      },
+      "circl_pdns": {
+        "source": "circl_pdns", "status": "success", "verdict": "unknown", "confidence": "low",
+        "summary": "Found 2 pDNS record(s).",
+        "raw": {
+          "record_count": 2,
+          "records": [
+            {"rrname": "bankofamerica-secure-login.net.", "rdata": "185.234.219.70", "rrtype": "A", "time_first": "2024-11-01", "time_last": "2024-11-14"},
+            {"rrname": "www.bankofamerica-secure-login.net.", "rdata": "185.234.219.70", "rrtype": "A", "time_first": "2024-11-01", "time_last": "2024-11-14"}
+          ]
+        }
+      },
+      "vt_passive_dns": {
+        "source": "vt_passive_dns", "status": "success", "verdict": "unknown", "confidence": "low",
+        "summary": "VirusTotal passive DNS: 2 resolution(s) found.",
+        "raw": {
+          "passive_dns": [
+            {"hostname": "bankofamerica-secure-login.net", "date": "2024-11-01"},
+            {"hostname": "www.bankofamerica-secure-login.net", "date": "2024-11-01"}
+          ],
+          "fallback_used": null,
+          "total_returned": 2,
+          "api_total": 2
+        }
+      },
+      "github": {
+        "source": "github", "status": "success", "verdict": "suspicious", "confidence": "low",
+        "summary": "GitHub: 2 relevant result(s) out of 5 total.",
+        "raw": {
+          "total_count": 5,
+          "relevant_count": 2,
+          "filtered_count": 3,
+          "repos": [
+            {"name": "mitchellkrogza/Phishing.Database", "description": "Active phishing domain confirmed: bankofamerica-secure-login.net — BofA impersonation credential harvester", "url": "https://github.com/mitchellkrogza/Phishing.Database", "stars": 3102, "updated": "2024-11-05T00:00:00Z", "topics": ["phishing", "blocklist"], "relevant": true},
+            {"name": "analyst-team/banking-phish-nov2024", "description": "Phishing kit analysis — bankofamerica-secure-login.net delivers EvilProxy-style credential capture page", "url": "https://github.com/analyst-team/banking-phish-nov2024", "stars": 12, "updated": "2024-11-04T00:00:00Z", "topics": ["phishing", "evilproxy"], "relevant": true}
+          ]
+        }
+      },
+      "threatfox": {
+        "source": "threatfox", "status": "success", "verdict": "malicious", "confidence": "high",
+        "summary": "ThreatFox: 1 IOC entry (confidence 90%) — payload_delivery phishing.",
+        "raw": {
+          "ioc_count": 1,
+          "iocs": [
+            {"id": "1281055", "ioc": "bankofamerica-secure-login.net", "ioc_type": "domain", "threat_type": "payload_delivery", "threat_type_desc": "Domain used for payload delivery", "malware": "phishing", "malware_printable": "Phishing", "confidence_level": 90, "first_seen": "2024-11-02 00:00:00 UTC", "last_seen": "2024-11-14 00:00:00 UTC", "tags": ["phishing", "banking", "credential-harvest"], "reporter": "abuse.ch"}
+          ],
+          "malware_families": ["Phishing"],
+          "threat_types": ["payload_delivery"],
+          "tags": ["phishing", "banking"],
+          "max_confidence_level": 90
+        }
+      },
+      "report": {
+        "verdict": "malicious",
+        "source_confidence": 94,
+        "llm_confidence": 91,
+        "overall_confidence": 93,
+        "summary": "bankofamerica-secure-login.net is an active Bank of America phishing domain registered November 1, 2024 with full privacy protection via a Panama-registered privacy service. The domain hosts four active credential harvesting pages confirmed by URLhaus and ThreatFox, and resolves exclusively to a bulletproof hosting IP (185.234.219.70). GitHub analysis reveals this domain is linked to an EvilProxy-style phishing kit. This should be blocked immediately.",
+        "key_findings": [
+          "Domain registered 2024-11-01 — 13 days old at time of analysis; newly stood-up phishing infrastructure",
+          "URLhaus: 4 active malicious URLs on this domain, all tagged phishing/banking/credential-harvest",
+          "ThreatFox: payload_delivery classification at 90% confidence",
+          "Resolves to 185.234.219.70 (bulletproof hosting, AS44477 Stark Industries)",
+          "GitHub: linked to EvilProxy-style phishing kit by security researchers"
+        ],
+        "mitre_techniques": [
+          {"technique_id": "T1566.002", "technique_name": "Phishing: Spearphishing Link", "justification": "Domain delivers phishing links impersonating Bank of America to harvest credentials"},
+          {"technique_id": "T1583.001", "technique_name": "Acquire Infrastructure: Domains", "justification": "Typosquat domain registered with privacy protection for disposable phishing use"},
+          {"technique_id": "T1056.003", "technique_name": "Input Capture: Web Portal Capture", "justification": "EvilProxy-style credential capture pages confirmed active on this domain"}
+        ],
+        "recommended_actions": [
+          "Block bankofamerica-secure-login.net at DNS resolver and email gateway immediately",
+          "Search email gateway logs for messages containing links to this domain in the past 14 days",
+          "Any user who visited this domain should have credentials reset and MFA methods re-enrolled"
+        ],
+        "iocs_extracted": ["185.234.219.70", "dns1.bullethost-ns.com", "dns2.bullethost-ns.com"],
+        "tlp": "GREEN",
+        "top_supporting_evidence": [
+          "URLhaus: 4 active credential phishing pages confirmed online as of 2024-11-14",
+          "ThreatFox: payload_delivery classification at 90% confidence from abuse.ch"
+        ],
+        "top_conflicting_evidence": []
+      },
+      "riskScore": 93
+    },
+    {
+      "target": "wellsfargo-account-alert.org",
+      "input_type": "domain",
+      "whois": {
+        "registrar": "Namecheap, Inc.",
+        "created": "2024-11-02",
+        "expires": "2025-11-02",
+        "registrant": "REDACTED FOR PRIVACY",
+        "country": "PA",
+        "nameservers": ["dns1.bullethost-ns.com", "dns2.bullethost-ns.com"]
+      },
+      "otx": {
+        "source": "otx", "status": "success", "verdict": "malicious", "confidence": "high",
+        "summary": "Found in 5 OTX pulse(s), tagged: phishing, banking, wells-fargo.",
+        "raw": {
+          "pulse_count": 5,
+          "malware_families": [],
+          "threat_actors": [],
+          "reputation": -70,
+          "indicator": "wellsfargo-account-alert.org"
+        }
+      },
+      "greynoise": {"source": "greynoise", "status": "not_applicable", "verdict": "unknown", "confidence": "low", "summary": "GreyNoise only supports IP address lookups.", "raw": {}},
+      "abuseipdb": {"source": "abuseipdb", "status": "not_applicable", "verdict": "unknown", "confidence": "low", "summary": "AbuseIPDB only supports IP address lookups.", "raw": {}},
+      "shodan": {"source": "shodan", "status": "not_applicable", "verdict": "unknown", "confidence": "low", "summary": "Shodan host data requires an IP address.", "raw": {}},
+      "malwarebazaar": {"source": "malwarebazaar", "status": "not_applicable", "verdict": "unknown", "confidence": "low", "summary": "MalwareBazaar only supports file hashes.", "raw": {}},
+      "urlhaus": {
+        "source": "urlhaus", "status": "success", "verdict": "malicious", "confidence": "high",
+        "summary": "URLhaus: 3 active malicious URL(s) — tags: phishing, banking.",
+        "raw": {
+          "url_count": 3,
+          "active_count": 3,
+          "tags": ["phishing", "banking"],
+          "urls": [
+            {"url": "http://wellsfargo-account-alert.org/signin", "status": "online", "date_added": "2024-11-03"},
+            {"url": "http://wellsfargo-account-alert.org/verify-account", "status": "online", "date_added": "2024-11-03"},
+            {"url": "http://wellsfargo-account-alert.org/secure/confirm", "status": "online", "date_added": "2024-11-03"}
+          ]
+        }
+      },
+      "circl_pdns": {
+        "source": "circl_pdns", "status": "success", "verdict": "unknown", "confidence": "low",
+        "summary": "Found 2 pDNS record(s).",
+        "raw": {
+          "record_count": 2,
+          "records": [
+            {"rrname": "wellsfargo-account-alert.org.", "rdata": "185.234.219.70", "rrtype": "A", "time_first": "2024-11-02", "time_last": "2024-11-14"},
+            {"rrname": "www.wellsfargo-account-alert.org.", "rdata": "185.234.219.70", "rrtype": "A", "time_first": "2024-11-02", "time_last": "2024-11-14"}
+          ]
+        }
+      },
+      "vt_passive_dns": {
+        "source": "vt_passive_dns", "status": "success", "verdict": "unknown", "confidence": "low",
+        "summary": "VirusTotal passive DNS: 2 resolution(s) found.",
+        "raw": {
+          "passive_dns": [
+            {"hostname": "wellsfargo-account-alert.org", "date": "2024-11-02"},
+            {"hostname": "www.wellsfargo-account-alert.org", "date": "2024-11-02"}
+          ],
+          "fallback_used": null, "total_returned": 2, "api_total": 2
+        }
+      },
+      "github": {
+        "source": "github", "status": "success", "verdict": "suspicious", "confidence": "low",
+        "summary": "GitHub: 1 relevant result(s) out of 3 total.",
+        "raw": {
+          "total_count": 3, "relevant_count": 1, "filtered_count": 2,
+          "repos": [
+            {"name": "mitchellkrogza/Phishing.Database", "description": "Active phishing domain: wellsfargo-account-alert.org — Wells Fargo credential harvester", "url": "https://github.com/mitchellkrogza/Phishing.Database", "stars": 3102, "updated": "2024-11-06T00:00:00Z", "topics": ["phishing", "blocklist"], "relevant": true}
+          ]
+        }
+      },
+      "threatfox": {
+        "source": "threatfox", "status": "success", "verdict": "malicious", "confidence": "high",
+        "summary": "ThreatFox: 1 IOC entry (confidence 85%) — payload_delivery phishing.",
+        "raw": {
+          "ioc_count": 1,
+          "iocs": [{"id": "1281062", "ioc": "wellsfargo-account-alert.org", "ioc_type": "domain", "threat_type": "payload_delivery", "threat_type_desc": "Phishing credential harvester", "malware": "phishing", "malware_printable": "Phishing", "confidence_level": 85, "first_seen": "2024-11-03 00:00:00 UTC", "last_seen": "2024-11-13 00:00:00 UTC", "tags": ["phishing", "banking"], "reporter": "abuse.ch"}],
+          "malware_families": ["Phishing"], "threat_types": ["payload_delivery"], "tags": ["phishing", "banking"], "max_confidence_level": 85
+        }
+      },
+      "report": {
+        "verdict": "malicious", "source_confidence": 92, "llm_confidence": 89, "overall_confidence": 91,
+        "summary": "wellsfargo-account-alert.org is an active Wells Fargo phishing domain registered November 2, 2024 — one day after a confirmed companion phishing domain (bankofamerica-secure-login.net). It shares identical nameservers, the same bulletproof hosting IP, and the same Namecheap/Panama privacy registrar. Three active credential-harvesting pages are online. The 24-hour registration gap and shared infrastructure fingerprint with another banking phishing domain strongly indicates a coordinated multi-bank phishing kit.",
+        "key_findings": [
+          "Domain registered 2024-11-02 — 24 hours after companion phishing domain bankofamerica-secure-login.net",
+          "Identical nameservers (dns1/2.bullethost-ns.com) and hosting IP (185.234.219.70) as bankofamerica-secure-login.net",
+          "URLhaus: 3 active phishing pages confirmed online",
+          "ThreatFox: payload_delivery at 85% confidence",
+          "Shared phishing database listing with BofA domain confirms same campaign cluster"
+        ],
+        "mitre_techniques": [
+          {"technique_id": "T1566.002", "technique_name": "Phishing: Spearphishing Link", "justification": "Active Wells Fargo credential phishing pages"},
+          {"technique_id": "T1583.001", "technique_name": "Acquire Infrastructure: Domains", "justification": "Typosquat registered same week as companion banking phishing domains"}
+        ],
+        "recommended_actions": [
+          "Block wellsfargo-account-alert.org at DNS and email gateway",
+          "Treat in context of multi-bank phishing campaign — see companion domain bankofamerica-secure-login.net",
+          "Search email logs for this domain in the past 14 days"
+        ],
+        "iocs_extracted": ["185.234.219.70", "bankofamerica-secure-login.net"],
+        "tlp": "GREEN",
+        "top_supporting_evidence": [
+          "Shared infrastructure fingerprint (IP, nameservers, registrar) with confirmed phishing domain bankofamerica-secure-login.net",
+          "URLhaus: 3 active phishing pages, ThreatFox: 85% confidence payload_delivery"
+        ],
+        "top_conflicting_evidence": []
+      },
+      "riskScore": 91
+    },
+    {
+      "target": "chase-security-verify.com",
+      "input_type": "domain",
+      "whois": {
+        "registrar": "Namecheap, Inc.",
+        "created": "2024-11-03",
+        "expires": "2025-11-03",
+        "registrant": "REDACTED FOR PRIVACY",
+        "country": "PA",
+        "nameservers": ["dns1.bullethost-ns.com", "dns2.bullethost-ns.com"]
+      },
+      "otx": {
+        "source": "otx", "status": "success", "verdict": "malicious", "confidence": "high",
+        "summary": "Found in 4 OTX pulse(s), tagged: phishing, banking, chase.",
+        "raw": {"pulse_count": 4, "malware_families": [], "threat_actors": [], "reputation": -65, "indicator": "chase-security-verify.com"}
+      },
+      "greynoise": {"source": "greynoise", "status": "not_applicable", "verdict": "unknown", "confidence": "low", "summary": "GreyNoise only supports IP address lookups.", "raw": {}},
+      "abuseipdb": {"source": "abuseipdb", "status": "not_applicable", "verdict": "unknown", "confidence": "low", "summary": "AbuseIPDB only supports IP address lookups.", "raw": {}},
+      "shodan": {"source": "shodan", "status": "not_applicable", "verdict": "unknown", "confidence": "low", "summary": "Shodan host data requires an IP address.", "raw": {}},
+      "malwarebazaar": {"source": "malwarebazaar", "status": "not_applicable", "verdict": "unknown", "confidence": "low", "summary": "MalwareBazaar only supports file hashes.", "raw": {}},
+      "urlhaus": {
+        "source": "urlhaus", "status": "success", "verdict": "malicious", "confidence": "high",
+        "summary": "URLhaus: 3 active malicious URL(s) — tags: phishing, banking.",
+        "raw": {
+          "url_count": 3, "active_count": 3, "tags": ["phishing", "banking"],
+          "urls": [
+            {"url": "http://chase-security-verify.com/login", "status": "online", "date_added": "2024-11-04"},
+            {"url": "http://chase-security-verify.com/verify", "status": "online", "date_added": "2024-11-04"},
+            {"url": "http://chase-security-verify.com/account/secure", "status": "online", "date_added": "2024-11-04"}
+          ]
+        }
+      },
+      "circl_pdns": {
+        "source": "circl_pdns", "status": "success", "verdict": "unknown", "confidence": "low",
+        "summary": "Found 2 pDNS record(s).",
+        "raw": {
+          "record_count": 2,
+          "records": [
+            {"rrname": "chase-security-verify.com.", "rdata": "185.234.219.70", "rrtype": "A", "time_first": "2024-11-03", "time_last": "2024-11-14"},
+            {"rrname": "www.chase-security-verify.com.", "rdata": "185.234.219.70", "rrtype": "A", "time_first": "2024-11-03", "time_last": "2024-11-14"}
+          ]
+        }
+      },
+      "vt_passive_dns": {
+        "source": "vt_passive_dns", "status": "success", "verdict": "unknown", "confidence": "low",
+        "summary": "VirusTotal passive DNS: 2 resolution(s) found.",
+        "raw": {"passive_dns": [{"hostname": "chase-security-verify.com", "date": "2024-11-03"}], "fallback_used": null, "total_returned": 1, "api_total": 1}
+      },
+      "github": {
+        "source": "github", "status": "success", "verdict": "suspicious", "confidence": "low",
+        "summary": "GitHub: 1 relevant result(s) out of 2 total.",
+        "raw": {
+          "total_count": 2, "relevant_count": 1, "filtered_count": 1,
+          "repos": [{"name": "mitchellkrogza/Phishing.Database", "description": "Active phishing: chase-security-verify.com — Chase Bank credential harvester, same infrastructure cluster as two other banking phish", "url": "https://github.com/mitchellkrogza/Phishing.Database", "stars": 3102, "updated": "2024-11-07T00:00:00Z", "topics": ["phishing", "blocklist"], "relevant": true}]
+        }
+      },
+      "threatfox": {
+        "source": "threatfox", "status": "success", "verdict": "malicious", "confidence": "high",
+        "summary": "ThreatFox: 1 IOC entry (confidence 80%) — payload_delivery phishing.",
+        "raw": {
+          "ioc_count": 1,
+          "iocs": [{"id": "1281078", "ioc": "chase-security-verify.com", "ioc_type": "domain", "threat_type": "payload_delivery", "malware": "phishing", "malware_printable": "Phishing", "confidence_level": 80, "first_seen": "2024-11-04 00:00:00 UTC", "last_seen": "2024-11-12 00:00:00 UTC", "tags": ["phishing", "banking", "chase"], "reporter": "abuse.ch"}],
+          "malware_families": ["Phishing"], "threat_types": ["payload_delivery"], "tags": ["phishing", "banking", "chase"], "max_confidence_level": 80
+        }
+      },
+      "report": {
+        "verdict": "malicious", "source_confidence": 91, "llm_confidence": 88, "overall_confidence": 90,
+        "summary": "chase-security-verify.com is the third domain in a coordinated three-bank phishing kit registered across three consecutive days (Nov 1–3). It completes a pattern targeting Bank of America, Wells Fargo, and now Chase — the three largest US retail banks — all using identical infrastructure. This is a textbook multi-bank phishing-as-a-service deployment.",
+        "key_findings": [
+          "Third consecutive-day registration (Nov 1: BofA, Nov 2: WF, Nov 3: Chase) — completes three-bank phishing kit",
+          "Identical nameservers and IP (185.234.219.70) as companion domains — confirmed same infrastructure",
+          "3 active phishing pages confirmed by URLhaus",
+          "ThreatFox 80% confidence payload_delivery",
+          "GitHub database explicitly links all three domains to same campaign cluster"
+        ],
+        "mitre_techniques": [
+          {"technique_id": "T1566.002", "technique_name": "Phishing: Spearphishing Link", "justification": "Chase Bank credential phishing pages active"},
+          {"technique_id": "T1583.001", "technique_name": "Acquire Infrastructure: Domains", "justification": "Third typosquat in coordinated multi-bank kit registered on consecutive days"}
+        ],
+        "recommended_actions": [
+          "Block chase-security-verify.com at DNS and email gateway",
+          "This is the third domain in a multi-bank phishing cluster — treat all three as a unified campaign",
+          "Block AS44477 (Stark Industries) subnet 185.234.219.0/24 at perimeter"
+        ],
+        "iocs_extracted": ["185.234.219.70", "bankofamerica-secure-login.net", "wellsfargo-account-alert.org"],
+        "tlp": "GREEN",
+        "top_supporting_evidence": [
+          "Consecutive-day registration pattern with identical nameservers/hosting as two other confirmed banking phish domains",
+          "URLhaus: 3 active phishing pages; ThreatFox: 80% confidence payload_delivery"
+        ],
+        "top_conflicting_evidence": []
+      },
+      "riskScore": 90
+    },
+    {
+      "target": "185.234.219.70",
+      "input_type": "ip",
+      "whois": {
+        "asn": "AS44477",
+        "org": "Stark Industries Solutions Ltd",
+        "country": "GB",
+        "network": "185.234.219.0/24",
+        "allocated": "2021-09-14",
+        "registry": "RIPE"
+      },
+      "otx": {
+        "source": "otx", "status": "success", "verdict": "malicious", "confidence": "high",
+        "summary": "Found in 18 OTX pulse(s), tagged: phishing, bulletproof-hosting, banking.",
+        "raw": {"pulse_count": 18, "malware_families": [], "threat_actors": [], "reputation": -90, "indicator": "185.234.219.70"}
+      },
+      "greynoise": {
+        "source": "greynoise", "status": "success", "verdict": "malicious", "confidence": "medium",
+        "summary": "GreyNoise: IP is classified malicious (noise=true).",
+        "raw": {"ip": "185.234.219.70", "noise": true, "riot": false, "classification": "malicious", "name": "unknown", "link": "https://viz.greynoise.io/ip/185.234.219.70", "last_seen": "2024-11-14", "message": "This IP is associated with malicious scanning and hosting activity."}
+      },
+      "abuseipdb": {
+        "source": "abuseipdb", "status": "success", "verdict": "malicious", "confidence": "high",
+        "summary": "AbuseIPDB score 97/100 from 44 report(s); ISP: Stark Industries Solutions Ltd.",
+        "raw": {
+          "ipAddress": "185.234.219.70", "isPublic": true, "ipVersion": 4, "isWhitelisted": false,
+          "abuseConfidenceScore": 97, "countryCode": "GB", "usageType": "Data Center/Web Hosting/Transit",
+          "isp": "Stark Industries Solutions Ltd", "domain": "stark-industries.solutions",
+          "hostnames": ["phish-hosting-01.stark-industries.solutions"],
+          "isTor": false, "totalReports": 44, "numDistinctUsers": 18,
+          "lastReportedAt": "2024-11-14T11:00:00+00:00"
+        }
+      },
+      "shodan": {
+        "source": "shodan", "status": "success", "verdict": "suspicious", "confidence": "medium",
+        "summary": "Host exposes 2 port(s) — nginx on 80/443, no CVEs.",
+        "raw": {
+          "ports": [80, 443],
+          "services": [
+            {"port": 80, "transport": "tcp", "product": "nginx", "version": "1.24.0"},
+            {"port": 443, "transport": "tcp", "product": "nginx", "version": "1.24.0"}
+          ],
+          "vulns": [],
+          "hostnames": ["phish-hosting-01.stark-industries.solutions"],
+          "org": "Stark Industries Solutions Ltd",
+          "country": "United Kingdom",
+          "last_update": "2024-11-10T08:00:00",
+          "tags": ["hosting"]
+        }
+      },
+      "malwarebazaar": {"source": "malwarebazaar", "status": "not_applicable", "verdict": "unknown", "confidence": "low", "summary": "MalwareBazaar only supports file hashes.", "raw": {}},
+      "urlhaus": {"source": "urlhaus", "status": "not_applicable", "verdict": "unknown", "confidence": "low", "summary": "URLhaus requires a domain or URL target.", "raw": {}},
+      "circl_pdns": {
+        "source": "circl_pdns", "status": "success", "verdict": "unknown", "confidence": "low",
+        "summary": "Found 6 pDNS record(s).",
+        "raw": {
+          "record_count": 6,
+          "records": [
+            {"rrname": "bankofamerica-secure-login.net.", "rdata": "185.234.219.70", "rrtype": "A", "time_first": "2024-11-01", "time_last": "2024-11-14"},
+            {"rrname": "wellsfargo-account-alert.org.", "rdata": "185.234.219.70", "rrtype": "A", "time_first": "2024-11-02", "time_last": "2024-11-14"},
+            {"rrname": "chase-security-verify.com.", "rdata": "185.234.219.70", "rrtype": "A", "time_first": "2024-11-03", "time_last": "2024-11-14"},
+            {"rrname": "citi-account-secure.net.", "rdata": "185.234.219.70", "rrtype": "A", "time_first": "2024-10-28", "time_last": "2024-11-08"},
+            {"rrname": "paypal-verify-account.org.", "rdata": "185.234.219.70", "rrtype": "A", "time_first": "2024-10-15", "time_last": "2024-11-01"},
+            {"rrname": "usaa-secure-login.com.", "rdata": "185.234.219.70", "rrtype": "A", "time_first": "2024-09-22", "time_last": "2024-10-30"}
+          ]
+        }
+      },
+      "vt_passive_dns": {
+        "source": "vt_passive_dns", "status": "success", "verdict": "unknown", "confidence": "low",
+        "summary": "VirusTotal passive DNS: 6 resolution(s) found.",
+        "raw": {
+          "passive_dns": [
+            {"hostname": "bankofamerica-secure-login.net", "date": "2024-11-01"},
+            {"hostname": "wellsfargo-account-alert.org", "date": "2024-11-02"},
+            {"hostname": "chase-security-verify.com", "date": "2024-11-03"},
+            {"hostname": "citi-account-secure.net", "date": "2024-10-28"},
+            {"hostname": "paypal-verify-account.org", "date": "2024-10-15"}
+          ],
+          "fallback_used": null, "total_returned": 5, "api_total": 6
+        }
+      },
+      "github": {
+        "source": "github", "status": "success", "verdict": "suspicious", "confidence": "medium",
+        "summary": "GitHub: 3 relevant result(s) out of 9 total.",
+        "raw": {
+          "total_count": 9, "relevant_count": 3, "filtered_count": 6,
+          "repos": [
+            {"name": "stamparm/ipsum", "description": "185.234.219.70 appears in 5+ threat feeds including phishing and bulletproof hosting blocklists", "url": "https://github.com/stamparm/ipsum", "stars": 5812, "updated": "2024-11-14T00:00:00Z", "topics": ["threat-intel", "blocklist"], "relevant": true},
+            {"name": "analyst-team/banking-phish-nov2024", "description": "185.234.219.70 confirmed hosting IP for multi-bank phishing kit (BofA, WF, Chase)", "url": "https://github.com/analyst-team/banking-phish-nov2024", "stars": 12, "updated": "2024-11-10T00:00:00Z", "topics": ["phishing"], "relevant": true},
+            {"name": "cert-phishing-feeds/stark-industries-phish", "description": "Stark Industries AS44477 used as bulletproof phishing hosting — 185.234.219.70 confirmed hosting 6+ banking phish domains", "url": "https://github.com/cert-phishing-feeds/stark-industries-phish", "stars": 88, "updated": "2024-11-08T00:00:00Z", "topics": ["phishing", "bulletproof-hosting"], "relevant": true}
+          ]
+        }
+      },
+      "threatfox": {
+        "source": "threatfox", "status": "success", "verdict": "malicious", "confidence": "high",
+        "summary": "ThreatFox: 2 IOC entries (max confidence 88%) — phishing hosting.",
+        "raw": {
+          "ioc_count": 2,
+          "iocs": [
+            {"id": "1281090", "ioc": "185.234.219.70", "ioc_type": "ip", "threat_type": "payload_delivery", "malware": "phishing", "malware_printable": "Phishing", "confidence_level": 88, "first_seen": "2024-10-15 00:00:00 UTC", "last_seen": "2024-11-14 00:00:00 UTC", "tags": ["phishing", "banking", "bulletproof-hosting"], "reporter": "abuse.ch"},
+            {"id": "1281091", "ioc": "185.234.219.70:443", "ioc_type": "ip:port", "threat_type": "payload_delivery", "malware": "phishing", "malware_printable": "Phishing", "confidence_level": 85, "first_seen": "2024-10-20 00:00:00 UTC", "last_seen": "2024-11-12 00:00:00 UTC", "tags": ["phishing", "banking"], "reporter": "community"}
+          ],
+          "malware_families": ["Phishing"], "threat_types": ["payload_delivery"], "tags": ["phishing", "banking", "bulletproof-hosting"], "max_confidence_level": 88
+        }
+      },
+      "report": {
+        "verdict": "malicious", "source_confidence": 95, "llm_confidence": 92, "overall_confidence": 94,
+        "summary": "185.234.219.70 is a Stark Industries Solutions bulletproof hosting IP that serves as the shared hosting backend for at least six banking phishing domains. Passive DNS reveals the current three-bank campaign (BofA, WF, Chase) plus three earlier targets (Citi, PayPal, USAA), confirming an ongoing multi-institution financial phishing operation. AbuseIPDB rates this IP at 97/100 from 44 reports across 18 reporters. This IP and its surrounding /24 subnet should be blocked across all egress controls.",
+        "key_findings": [
+          "Passive DNS shows 6 banking/financial phishing domains hosted on this single IP across a 60-day period — ongoing systematic operation",
+          "AbuseIPDB: 97/100 from 44 reports across 18 distinct reporters",
+          "AS44477 (Stark Industries Solutions) is a known bulletproof hosting provider frequently used for phishing and malware hosting",
+          "ThreatFox: 2 IOC entries (88% and 85% confidence) confirming payload delivery role",
+          "18 OTX pulses from independent researchers corroborating phishing/bulletproof-hosting attribution"
+        ],
+        "mitre_techniques": [
+          {"technique_id": "T1583.003", "technique_name": "Acquire Infrastructure: Virtual Private Server", "justification": "Bulletproof VPS hosting used to maintain persistent phishing infrastructure across multiple campaigns"},
+          {"technique_id": "T1071.001", "technique_name": "Application Layer Protocol: Web Protocols", "justification": "HTTPS on port 443 serves phishing pages to victims"}
+        ],
+        "recommended_actions": [
+          "Block 185.234.219.70 and the full /24 subnet 185.234.219.0/24 at perimeter — entire subnet is bulletproof hosting",
+          "Search proxy and firewall logs for any connections to this IP in the past 90 days",
+          "Hunt for additional phishing domains on this IP using threat intel feeds — at least 6 banking domains confirmed"
+        ],
+        "iocs_extracted": ["bankofamerica-secure-login.net", "wellsfargo-account-alert.org", "chase-security-verify.com", "citi-account-secure.net", "paypal-verify-account.org", "usaa-secure-login.com"],
+        "tlp": "GREEN",
+        "top_supporting_evidence": [
+          "Passive DNS: 6 banking phishing domains all pointing to this IP across a 60-day window — confirms systematic hosting role",
+          "AbuseIPDB: 97/100 from 44 reports; Stark Industries AS44477 is a well-documented bulletproof hosting provider"
+        ],
+        "top_conflicting_evidence": [
+          "Shodan shows only standard nginx on 80/443 with no CVEs — no technical fingerprint of malicious hosting beyond DNS attribution"
+        ]
+      },
+      "riskScore": 94
+    }
+  ],
+  "campaign_report": {
+    "campaign_verdict": "coordinated_malicious",
+    "confidence": 97,
+    "summary": "These four indicators form a highly coordinated multi-bank phishing kit targeting the three largest US retail banks (Bank of America, Wells Fargo, Chase) plus a shared bulletproof hosting backend. The three phishing domains were registered on consecutive days (November 1–3, 2024) using identical Namecheap privacy registrations and the same pair of nameservers, and all resolve exclusively to 185.234.219.70 (AS44477 Stark Industries) — a bulletproof hosting provider with a documented history of financial phishing campaigns. Passive DNS on the hosting IP reveals at least three additional earlier banking targets (Citi, PayPal, USAA), confirming this is an ongoing phishing-as-a-service operation rather than a one-off. Campaign confidence is the highest possible: five independent signals (registration timing, shared nameservers, shared IP, shared registrar, cross-listed OTX pulses) all point to a single threat actor.",
+    "shared_patterns": [
+      "All three phishing domains registered via Namecheap with identical Panama privacy service within a 48-hour window (2024-11-01, 2024-11-02, 2024-11-03)",
+      "Identical nameservers across all three domains: dns1.bullethost-ns.com and dns2.bullethost-ns.com — strongly suggests automated domain provisioning",
+      "All three domains resolve exclusively to 185.234.219.70 (AS44477 Stark Industries) — single shared bulletproof hosting backend",
+      "Consistent typosquat naming convention: [bank-name]-[action-verb].{net,org,com} — matches known PhaaS kit templates",
+      "OTX cross-listing: two independent research pulses flag all three phishing domains in the same campaign report",
+      "URLhaus active malicious URL entries present on all three domains with identical tags: phishing, banking, credential-harvest"
+    ],
+    "infrastructure_map": {
+      "c2": [],
+      "delivery": [
+        "bankofamerica-secure-login.net",
+        "wellsfargo-account-alert.org",
+        "chase-security-verify.com"
+      ],
+      "exfiltration": [
+        "185.234.219.70"
+      ],
+      "unknown": []
+    },
+    "threat_actor_hypothesis": "The operational pattern — simultaneous multi-bank targeting, automated domain provisioning, bulletproof hosting on AS44477 (Stark Industries), and naming convention consistency — is characteristic of a phishing-as-a-service (PhaaS) platform rather than a manual threat actor. The Stark Industries hosting choice and consecutive-day registration cadence have been observed in EvilProxy and Caffeine Kit PhaaS deployments. No named threat group can be attributed with certainty, but the infrastructure and scale suggest a financially motivated criminal operator selling phishing campaigns as a managed service.",
+    "mitre_techniques": [
+      {"technique_id": "T1583.001", "technique_name": "Acquire Infrastructure: Domains", "justification": "Three typosquat domains registered simultaneously via the same registrar/privacy service targeting BofA, WF, and Chase"},
+      {"technique_id": "T1566.002", "technique_name": "Phishing: Spearphishing Link", "justification": "All three delivery domains serve active credential capture pages impersonating major US banks"},
+      {"technique_id": "T1056.003", "technique_name": "Input Capture: Web Portal Capture", "justification": "URLhaus confirms active credential-harvesting pages on all three phishing domains"},
+      {"technique_id": "T1583.003", "technique_name": "Acquire Infrastructure: Virtual Private Server", "justification": "185.234.219.70 on AS44477 Stark Industries serves as the persistent bulletproof hosting backend for collected credentials"},
+      {"technique_id": "T1657", "technique_name": "Financial Theft", "justification": "Multi-bank phishing kit designed to harvest banking credentials for financial account takeover"}
+    ],
+    "recommended_actions": [
+      "Block all three phishing domains (bankofamerica-secure-login.net, wellsfargo-account-alert.org, chase-security-verify.com) at DNS resolver, email gateway, and web proxy immediately",
+      "Block 185.234.219.70 and the full /24 subnet 185.234.219.0/24 — the entire Stark Industries subnet has a documented phishing hosting history",
+      "Search email gateway logs for messages containing links to any of the three phishing domains in the past 30 days; any delivery should trigger user notification and mandatory credential reset",
+      "Search web proxy and endpoint DNS logs for user visits to any phishing domain — any confirmed visit requires immediate credential reset + MFA re-enrollment for the affected account",
+      "Hunt for additional domains matching the pattern [bank-name]-[action].tld on AS44477 (185.234.0.0/16) — passive DNS reveals at least 3 earlier targets (Citi, PayPal, USAA) suggesting additional active kit domains exist",
+      "Share all four indicators with FS-ISAC and your banking sector threat sharing partners for downstream propagation"
+    ]
+  }
+}

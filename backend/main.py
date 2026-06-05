@@ -37,13 +37,14 @@ DEMO_MODE     = os.getenv("DEMO_MODE", "false").lower() == "true"
 
 _DEMO_DIR = Path(__file__).parent / "demo_data"
 
-def _load_demo_data() -> tuple[dict, list]:
-    """Returns (cache_dict keyed by target, manifest_list)."""
-    cache: dict[str, dict] = {}
-    manifest: list[dict]   = []
+def _load_demo_data() -> tuple[dict, list, dict]:
+    """Returns (single_cache keyed by target, manifest_list, campaign_cache keyed by frozenset)."""
+    cache: dict[str, dict]          = {}
+    campaign_cache: dict[frozenset, dict] = {}
+    manifest: list[dict]            = []
 
     if not _DEMO_DIR.exists():
-        return cache, manifest
+        return cache, manifest, campaign_cache
 
     # Load manifest for ordered display + labels
     manifest_path = _DEMO_DIR / "manifest.json"
@@ -51,22 +52,25 @@ def _load_demo_data() -> tuple[dict, list]:
         with open(manifest_path, encoding="utf-8") as f:
             manifest = json.load(f)
 
-    # Load each result file; filename stem == target string
+    # Load each result file; campaign files have "targets" + "campaign_report" at top level
     for path in _DEMO_DIR.glob("*.json"):
         if path.name == "manifest.json":
             continue
         try:
             with open(path, encoding="utf-8") as f:
                 data = json.load(f)
-            target_key = path.stem.lower()
-            cache[target_key] = data
+            if "campaign_report" in data and "targets" in data:
+                key = frozenset(t.lower().strip() for t in data["targets"])
+                campaign_cache[key] = data
+            else:
+                cache[path.stem.lower()] = data
         except Exception:
             pass
 
-    return cache, manifest
+    return cache, manifest, campaign_cache
 
 
-DEMO_CACHE, DEMO_MANIFEST = _load_demo_data()
+DEMO_CACHE, DEMO_MANIFEST, CAMPAIGN_DEMO_CACHE = _load_demo_data()
 
 # ── App ───────────────────────────────────────────────────────────────────────
 
@@ -189,9 +193,25 @@ async def analyze_campaign(body: CampaignRequest):
     Analyze a set of related IOCs as a unified campaign.
     Runs each target through the full pipeline concurrently, then synthesizes
     all results into a campaign-level assessment via LLM.
+    In DEMO_MODE, returns pre-cached results when the target set matches a known demo campaign.
     """
     if not body.targets:
         return {"error": "No targets provided"}
+
+    if DEMO_MODE:
+        key = frozenset(t.lower().strip() for t in body.targets)
+        cached = CAMPAIGN_DEMO_CACHE.get(key)
+        if cached:
+            return cached
+        campaign_entries = [e for e in DEMO_MANIFEST if e.get("type") == "campaign"]
+        return {
+            "demo_error": True,
+            "message": (
+                "Demo mode is active — this indicator set doesn't match a pre-loaded campaign. "
+                "Click one of the demo campaign chips to load an example."
+            ),
+            "available_campaigns": campaign_entries,
+        }
 
     semaphore = asyncio.Semaphore(10)
 

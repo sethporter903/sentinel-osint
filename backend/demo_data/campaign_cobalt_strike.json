@@ -1,0 +1,530 @@
+{
+  "targets": [
+    "45.153.160.140",
+    "api-telemetry.update-svc.net",
+    "194.165.16.158",
+    "cdn-metrics.analytics-svc.com"
+  ],
+  "individual_results": [
+    {
+      "target": "45.153.160.140",
+      "input_type": "ip",
+      "whois": {
+        "asn": "AS209588",
+        "org": "Flyservers S.A.",
+        "country": "PA",
+        "network": "45.153.160.0/24",
+        "allocated": "2020-11-18",
+        "registry": "RIPE"
+      },
+      "otx": {
+        "source": "otx", "status": "success", "verdict": "malicious", "confidence": "high",
+        "summary": "Found in 31 OTX pulse(s), malware: CobaltStrike, Beacon.",
+        "raw": {"pulse_count": 31, "malware_families": ["CobaltStrike", "Beacon"], "threat_actors": ["APT29", "FIN7"], "reputation": -95, "indicator": "45.153.160.140"}
+      },
+      "greynoise": {
+        "source": "greynoise", "status": "success", "verdict": "malicious", "confidence": "high",
+        "summary": "GreyNoise: classified malicious (noise=true, riot=false).",
+        "raw": {"ip": "45.153.160.140", "noise": true, "riot": false, "classification": "malicious", "name": "unknown", "link": "https://viz.greynoise.io/ip/45.153.160.140", "last_seen": "2024-11-14", "message": "This IP is actively scanning and has been associated with malicious activity."}
+      },
+      "abuseipdb": {
+        "source": "abuseipdb", "status": "success", "verdict": "malicious", "confidence": "high",
+        "summary": "AbuseIPDB score 98/100 from 61 report(s); ISP: Flyservers S.A.",
+        "raw": {
+          "ipAddress": "45.153.160.140", "isPublic": true, "ipVersion": 4, "isWhitelisted": false,
+          "abuseConfidenceScore": 98, "countryCode": "PA", "usageType": "Data Center/Web Hosting/Transit",
+          "isp": "Flyservers S.A.", "domain": "flyservers.com",
+          "hostnames": ["45-153-160-140.flyservers.com"],
+          "isTor": false, "totalReports": 61, "numDistinctUsers": 24,
+          "lastReportedAt": "2024-11-14T14:45:00+00:00"
+        }
+      },
+      "shodan": {
+        "source": "shodan", "status": "success", "verdict": "malicious", "confidence": "high",
+        "summary": "Host exposes 4 port(s) — Cobalt Strike fingerprint on 443, high-risk ports 4444 and 8080.",
+        "raw": {
+          "ports": [80, 443, 4444, 8080],
+          "services": [
+            {"port": 443, "transport": "tcp", "product": "Cobalt Strike Team Server", "version": "4.9"},
+            {"port": 4444, "transport": "tcp", "product": "", "version": ""},
+            {"port": 8080, "transport": "tcp", "product": "nginx", "version": "1.18.0"},
+            {"port": 80, "transport": "tcp", "product": "nginx", "version": "1.18.0"}
+          ],
+          "vulns": [],
+          "hostnames": ["45-153-160-140.flyservers.com"],
+          "org": "Flyservers S.A.",
+          "country": "Panama",
+          "last_update": "2024-11-12T03:00:00",
+          "tags": ["c2", "cobalt-strike"]
+        }
+      },
+      "malwarebazaar": {"source": "malwarebazaar", "status": "not_applicable", "verdict": "unknown", "confidence": "low", "summary": "MalwareBazaar only supports file hashes.", "raw": {}},
+      "urlhaus": {"source": "urlhaus", "status": "not_applicable", "verdict": "unknown", "confidence": "low", "summary": "URLhaus requires a domain or URL target.", "raw": {}},
+      "circl_pdns": {
+        "source": "circl_pdns", "status": "success", "verdict": "unknown", "confidence": "low",
+        "summary": "Found 3 pDNS record(s).",
+        "raw": {
+          "record_count": 3,
+          "records": [
+            {"rrname": "api-telemetry.update-svc.net.", "rdata": "45.153.160.140", "rrtype": "A", "time_first": "2024-10-28", "time_last": "2024-11-14"},
+            {"rrname": "cs-beacon.update-svc.net.", "rdata": "45.153.160.140", "rrtype": "A", "time_first": "2024-10-28", "time_last": "2024-11-10"},
+            {"rrname": "45-153-160-140.flyservers.com.", "rdata": "45.153.160.140", "rrtype": "A", "time_first": "2020-11-18", "time_last": "2024-11-14"}
+          ]
+        }
+      },
+      "vt_passive_dns": {
+        "source": "vt_passive_dns", "status": "success", "verdict": "unknown", "confidence": "low",
+        "summary": "VirusTotal passive DNS: 3 resolution(s) found.",
+        "raw": {
+          "passive_dns": [
+            {"hostname": "api-telemetry.update-svc.net", "date": "2024-10-28"},
+            {"hostname": "cs-beacon.update-svc.net", "date": "2024-10-28"}
+          ],
+          "fallback_used": null, "total_returned": 2, "api_total": 3
+        }
+      },
+      "github": {
+        "source": "github", "status": "success", "verdict": "malicious", "confidence": "medium",
+        "summary": "GitHub: 3 relevant result(s) out of 14 total.",
+        "raw": {
+          "total_count": 14, "relevant_count": 3, "filtered_count": 11,
+          "repos": [
+            {"name": "feodotracker/feodotracker", "description": "Feodo Tracker: 45.153.160.140 confirmed Cobalt Strike C2 — active beacon traffic on port 443", "url": "https://github.com/feodotracker/feodotracker", "stars": 892, "updated": "2024-11-14T00:00:00Z", "topics": ["c2", "cobalt-strike", "feodo"], "relevant": true},
+            {"name": "RedDrip7/CobaltStrikeParser", "description": "45.153.160.140:443 confirmed CS team server — malleable C2 profile fingerprinted, watermark hash 0x4d34e0a5", "url": "https://github.com/RedDrip7/CobaltStrikeParser", "stars": 1203, "updated": "2024-11-08T00:00:00Z", "topics": ["cobalt-strike", "c2", "dfir"], "relevant": true},
+            {"name": "crew/apt-tracker-2024", "description": "45.153.160.140 attributed to FIN7 infrastructure — same watermark observed in previous FIN7 beacon cluster", "url": "https://github.com/crew/apt-tracker-2024", "stars": 341, "updated": "2024-11-05T00:00:00Z", "topics": ["fin7", "apt", "c2"], "relevant": true}
+          ]
+        }
+      },
+      "threatfox": {
+        "source": "threatfox", "status": "success", "verdict": "malicious", "confidence": "high",
+        "summary": "ThreatFox: 3 IOC entries (max confidence 100%) — botnet_cc Cobalt Strike.",
+        "raw": {
+          "ioc_count": 3,
+          "iocs": [
+            {"id": "1291044", "ioc": "45.153.160.140:443", "ioc_type": "ip:port", "threat_type": "botnet_cc", "threat_type_desc": "Cobalt Strike C2 server", "malware": "win.cobalt_strike", "malware_printable": "Cobalt Strike", "confidence_level": 100, "first_seen": "2024-10-27 00:00:00 UTC", "last_seen": "2024-11-14 00:00:00 UTC", "tags": ["cobalt-strike", "beacon", "fin7"], "reporter": "abuse.ch"},
+            {"id": "1291045", "ioc": "45.153.160.140:4444", "ioc_type": "ip:port", "threat_type": "botnet_cc", "malware": "win.cobalt_strike", "malware_printable": "Cobalt Strike", "confidence_level": 95, "first_seen": "2024-10-28 00:00:00 UTC", "last_seen": "2024-11-10 00:00:00 UTC", "tags": ["cobalt-strike", "c2"], "reporter": "community"},
+            {"id": "1291046", "ioc": "45.153.160.140:8080", "ioc_type": "ip:port", "threat_type": "botnet_cc", "malware": "win.cobalt_strike", "malware_printable": "Cobalt Strike", "confidence_level": 90, "first_seen": "2024-10-28 00:00:00 UTC", "last_seen": "2024-11-12 00:00:00 UTC", "tags": ["cobalt-strike", "staging"], "reporter": "community"}
+          ],
+          "malware_families": ["Cobalt Strike"], "threat_types": ["botnet_cc"], "tags": ["cobalt-strike", "beacon", "fin7"], "max_confidence_level": 100
+        }
+      },
+      "report": {
+        "verdict": "malicious", "source_confidence": 98, "llm_confidence": 95, "overall_confidence": 97,
+        "summary": "45.153.160.140 is a confirmed Cobalt Strike team server operating on three ports simultaneously: port 443 (fingerprinted CS 4.9 by Shodan), port 4444, and port 8080. Feodo Tracker, ThreatFox (100% confidence), and 31 OTX pulses from independent researchers all independently corroborate active C2 activity. The Cobalt Strike watermark hash (0x4d34e0a5) has been attributed to FIN7 infrastructure by DFIR analysts. This is among the highest-confidence C2 verdicts possible — immediate blocking and incident response are required.",
+        "key_findings": [
+          "Shodan fingerprints Cobalt Strike Team Server 4.9 on port 443 — direct C2 tool identification",
+          "ThreatFox: 3 confirmed IOC entries across ports 443, 4444, 8080 at 90–100% confidence",
+          "Cobalt Strike watermark 0x4d34e0a5 attributed to FIN7 infrastructure by DFIR researchers on GitHub",
+          "AbuseIPDB: 98/100 from 61 reports across 24 distinct reporters",
+          "Passive DNS reveals companion domain api-telemetry.update-svc.net using this IP as C2 resolver"
+        ],
+        "mitre_techniques": [
+          {"technique_id": "T1071.001", "technique_name": "Application Layer Protocol: Web Protocols", "justification": "Cobalt Strike beacon using HTTPS on port 443 for C2 communication"},
+          {"technique_id": "T1571", "technique_name": "Non-Standard Port", "justification": "Cobalt Strike also listening on non-standard ports 4444 and 8080 for staging and alternative beacon channels"},
+          {"technique_id": "T1583.003", "technique_name": "Acquire Infrastructure: Virtual Private Server", "justification": "Flyservers S.A. (AS209588) VPS used as persistent C2 infrastructure"},
+          {"technique_id": "T1090.001", "technique_name": "Proxy: Internal Proxy", "justification": "Malleable C2 profile with nginx front-end on port 80 acts as traffic redirector to Cobalt Strike listener"}
+        ],
+        "recommended_actions": [
+          "Block 45.153.160.140 at perimeter firewall on all ports — confirmed active Cobalt Strike C2",
+          "Search SIEM for any outbound connections to 45.153.160.140 on ports 443, 4444, and 8080 over the last 90 days — any hit is a confirmed beacon",
+          "If connections found: initiate incident response immediately; assume lateral movement and credential theft have occurred",
+          "Hunt for Cobalt Strike beacon artifacts (watermark 0x4d34e0a5) in EDR telemetry across your environment",
+          "Block the full /24 subnet 45.153.160.0/24 and hunt for related FIN7 IOCs in threat intel feeds"
+        ],
+        "iocs_extracted": ["45.153.160.140:443", "45.153.160.140:4444", "45.153.160.140:8080", "api-telemetry.update-svc.net", "cs-beacon.update-svc.net"],
+        "tlp": "AMBER",
+        "top_supporting_evidence": [
+          "Shodan: Cobalt Strike Team Server 4.9 directly fingerprinted on port 443 — highest possible tool identification confidence",
+          "ThreatFox: 3 IOC entries at 90–100% confidence; AbuseIPDB: 98/100 from 61 reports across 24 reporters"
+        ],
+        "top_conflicting_evidence": [
+          "FIN7 attribution is based on watermark hash analysis by external researchers, not direct TTP correlation — should be treated as medium-confidence attribution pending additional corroboration"
+        ]
+      },
+      "riskScore": 97
+    },
+    {
+      "target": "api-telemetry.update-svc.net",
+      "input_type": "domain",
+      "whois": {
+        "registrar": "Porkbun LLC",
+        "created": "2024-10-26",
+        "expires": "2025-10-26",
+        "registrant": "REDACTED FOR PRIVACY",
+        "country": "IS",
+        "nameservers": ["ns1.flyservers-dns.net", "ns2.flyservers-dns.net"]
+      },
+      "otx": {
+        "source": "otx", "status": "success", "verdict": "malicious", "confidence": "high",
+        "summary": "Found in 12 OTX pulse(s), tagged: cobalt-strike, c2, beacon.",
+        "raw": {"pulse_count": 12, "malware_families": ["CobaltStrike"], "threat_actors": ["FIN7"], "reputation": -85, "indicator": "api-telemetry.update-svc.net"}
+      },
+      "greynoise": {"source": "greynoise", "status": "not_applicable", "verdict": "unknown", "confidence": "low", "summary": "GreyNoise only supports IP address lookups.", "raw": {}},
+      "abuseipdb": {"source": "abuseipdb", "status": "not_applicable", "verdict": "unknown", "confidence": "low", "summary": "AbuseIPDB only supports IP address lookups.", "raw": {}},
+      "shodan": {"source": "shodan", "status": "not_applicable", "verdict": "unknown", "confidence": "low", "summary": "Shodan host data requires an IP address.", "raw": {}},
+      "malwarebazaar": {"source": "malwarebazaar", "status": "not_applicable", "verdict": "unknown", "confidence": "low", "summary": "MalwareBazaar only supports file hashes.", "raw": {}},
+      "urlhaus": {
+        "source": "urlhaus", "status": "success", "verdict": "malicious", "confidence": "high",
+        "summary": "URLhaus: 2 active malicious URL(s) — Cobalt Strike malleable C2.",
+        "raw": {
+          "url_count": 2, "active_count": 2, "tags": ["cobalt-strike", "c2", "malleable-c2"],
+          "urls": [
+            {"url": "https://api-telemetry.update-svc.net/api/v1/metrics", "status": "online", "date_added": "2024-10-29"},
+            {"url": "https://api-telemetry.update-svc.net/submit", "status": "online", "date_added": "2024-10-29"}
+          ]
+        }
+      },
+      "circl_pdns": {
+        "source": "circl_pdns", "status": "success", "verdict": "unknown", "confidence": "low",
+        "summary": "Found 2 pDNS record(s).",
+        "raw": {
+          "record_count": 2,
+          "records": [
+            {"rrname": "api-telemetry.update-svc.net.", "rdata": "45.153.160.140", "rrtype": "A", "time_first": "2024-10-28", "time_last": "2024-11-14"},
+            {"rrname": "api-telemetry.update-svc.net.", "rdata": "194.165.16.158", "rrtype": "A", "time_first": "2024-11-05", "time_last": "2024-11-14"}
+          ]
+        }
+      },
+      "vt_passive_dns": {
+        "source": "vt_passive_dns", "status": "success", "verdict": "unknown", "confidence": "low",
+        "summary": "VirusTotal passive DNS: 2 resolution(s) found.",
+        "raw": {
+          "passive_dns": [
+            {"hostname": "api-telemetry.update-svc.net", "date": "2024-10-28"},
+            {"hostname": "api-telemetry.update-svc.net", "date": "2024-11-05"}
+          ],
+          "fallback_used": null, "total_returned": 2, "api_total": 2
+        }
+      },
+      "github": {
+        "source": "github", "status": "success", "verdict": "malicious", "confidence": "medium",
+        "summary": "GitHub: 2 relevant result(s) out of 6 total.",
+        "raw": {
+          "total_count": 6, "relevant_count": 2, "filtered_count": 4,
+          "repos": [
+            {"name": "RedDrip7/CobaltStrikeParser", "description": "api-telemetry.update-svc.net confirmed Cobalt Strike malleable C2 domain — resolves to two C2 IPs for failover, watermark 0x4d34e0a5", "url": "https://github.com/RedDrip7/CobaltStrikeParser", "stars": 1203, "updated": "2024-11-09T00:00:00Z", "topics": ["cobalt-strike", "c2"], "relevant": true},
+            {"name": "crew/apt-tracker-2024", "description": "FIN7 malleable C2 domain — api-telemetry.update-svc.net impersonating telemetry/API endpoint to blend with legitimate traffic", "url": "https://github.com/crew/apt-tracker-2024", "stars": 341, "updated": "2024-11-06T00:00:00Z", "topics": ["fin7", "c2"], "relevant": true}
+          ]
+        }
+      },
+      "threatfox": {
+        "source": "threatfox", "status": "success", "verdict": "malicious", "confidence": "high",
+        "summary": "ThreatFox: 1 IOC entry (confidence 95%) — botnet_cc Cobalt Strike.",
+        "raw": {
+          "ioc_count": 1,
+          "iocs": [{"id": "1291060", "ioc": "api-telemetry.update-svc.net", "ioc_type": "domain", "threat_type": "botnet_cc", "threat_type_desc": "Cobalt Strike malleable C2 domain", "malware": "win.cobalt_strike", "malware_printable": "Cobalt Strike", "confidence_level": 95, "first_seen": "2024-10-29 00:00:00 UTC", "last_seen": "2024-11-14 00:00:00 UTC", "tags": ["cobalt-strike", "malleable-c2", "fin7"], "reporter": "abuse.ch"}],
+          "malware_families": ["Cobalt Strike"], "threat_types": ["botnet_cc"], "tags": ["cobalt-strike", "malleable-c2", "fin7"], "max_confidence_level": 95
+        }
+      },
+      "report": {
+        "verdict": "malicious", "source_confidence": 93, "llm_confidence": 91, "overall_confidence": 92,
+        "summary": "api-telemetry.update-svc.net is a Cobalt Strike malleable C2 domain designed to impersonate a legitimate API telemetry endpoint. It was registered October 26, 2024 and resolves to two C2 IPs (45.153.160.140 and 194.165.16.158), indicating a failover beacon configuration. The domain, watermark, and naming pattern have been attributed to FIN7 by DFIR researchers. The masquerading as a telemetry API is a classic CS malleable C2 technique to blend beacon traffic with legitimate application traffic.",
+        "key_findings": [
+          "Domain registered 2024-10-26 — masquerading as legitimate API telemetry endpoint to evade detection",
+          "Resolves to two C2 IPs (45.153.160.140, 194.165.16.158) — failover beacon configuration",
+          "ThreatFox: botnet_cc classification at 95% confidence with Cobalt Strike attribution",
+          "Same Cobalt Strike watermark (0x4d34e0a5) as companion IP 45.153.160.140 — confirmed same C2 infrastructure",
+          "FIN7 attribution by DFIR researchers via watermark correlation"
+        ],
+        "mitre_techniques": [
+          {"technique_id": "T1071.001", "technique_name": "Application Layer Protocol: Web Protocols", "justification": "Malleable C2 domain masquerading as API telemetry endpoint over HTTPS"},
+          {"technique_id": "T1568.001", "technique_name": "Dynamic Resolution: Fast Flux DNS", "justification": "Domain resolves to two different C2 IPs (45.153.160.140, 194.165.16.158) for beacon failover"},
+          {"technique_id": "T1583.001", "technique_name": "Acquire Infrastructure: Domains", "justification": "Newly registered domain mimicking legitimate API naming convention for C2 evasion"}
+        ],
+        "recommended_actions": [
+          "Block api-telemetry.update-svc.net at DNS resolver — any internal DNS query for this domain indicates an active Cobalt Strike beacon",
+          "Search DNS logs for queries to api-telemetry.update-svc.net and the parent domain update-svc.net — either indicates compromise",
+          "If DNS queries found: immediately isolate the source endpoint and initiate incident response"
+        ],
+        "iocs_extracted": ["45.153.160.140", "194.165.16.158", "cdn-metrics.analytics-svc.com", "update-svc.net"],
+        "tlp": "AMBER",
+        "top_supporting_evidence": [
+          "ThreatFox: botnet_cc Cobalt Strike at 95% confidence; DFIR watermark correlation to known FIN7 C2 cluster",
+          "Dual-IP DNS resolution (45.153.160.140 + 194.165.16.158) confirms failover beacon architecture"
+        ],
+        "top_conflicting_evidence": []
+      },
+      "riskScore": 92
+    },
+    {
+      "target": "194.165.16.158",
+      "input_type": "ip",
+      "whois": {
+        "asn": "AS209588",
+        "org": "Flyservers S.A.",
+        "country": "PA",
+        "network": "194.165.16.0/24",
+        "allocated": "2020-11-18",
+        "registry": "RIPE"
+      },
+      "otx": {
+        "source": "otx", "status": "success", "verdict": "malicious", "confidence": "high",
+        "summary": "Found in 27 OTX pulse(s), malware: CobaltStrike, Beacon.",
+        "raw": {"pulse_count": 27, "malware_families": ["CobaltStrike", "Beacon"], "threat_actors": ["FIN7", "APT41"], "reputation": -92, "indicator": "194.165.16.158"}
+      },
+      "greynoise": {
+        "source": "greynoise", "status": "success", "verdict": "malicious", "confidence": "high",
+        "summary": "GreyNoise: classified malicious (noise=true, riot=false).",
+        "raw": {"ip": "194.165.16.158", "noise": true, "riot": false, "classification": "malicious", "name": "unknown", "link": "https://viz.greynoise.io/ip/194.165.16.158", "last_seen": "2024-11-13", "message": "This IP is actively scanning and has been associated with malicious C2 activity."}
+      },
+      "abuseipdb": {
+        "source": "abuseipdb", "status": "success", "verdict": "malicious", "confidence": "high",
+        "summary": "AbuseIPDB score 96/100 from 53 report(s); ISP: Flyservers S.A.",
+        "raw": {
+          "ipAddress": "194.165.16.158", "isPublic": true, "ipVersion": 4, "isWhitelisted": false,
+          "abuseConfidenceScore": 96, "countryCode": "PA", "usageType": "Data Center/Web Hosting/Transit",
+          "isp": "Flyservers S.A.", "domain": "flyservers.com",
+          "hostnames": ["194-165-16-158.flyservers.com"],
+          "isTor": false, "totalReports": 53, "numDistinctUsers": 21,
+          "lastReportedAt": "2024-11-13T22:15:00+00:00"
+        }
+      },
+      "shodan": {
+        "source": "shodan", "status": "success", "verdict": "malicious", "confidence": "high",
+        "summary": "Host exposes 4 port(s) — Cobalt Strike fingerprint on 443, high-risk ports 4444 and 8080.",
+        "raw": {
+          "ports": [80, 443, 4444, 8080],
+          "services": [
+            {"port": 443, "transport": "tcp", "product": "Cobalt Strike Team Server", "version": "4.9"},
+            {"port": 4444, "transport": "tcp", "product": "", "version": ""},
+            {"port": 8080, "transport": "tcp", "product": "nginx", "version": "1.18.0"},
+            {"port": 80, "transport": "tcp", "product": "nginx", "version": "1.18.0"}
+          ],
+          "vulns": [],
+          "hostnames": ["194-165-16-158.flyservers.com"],
+          "org": "Flyservers S.A.",
+          "country": "Panama",
+          "last_update": "2024-11-12T05:00:00",
+          "tags": ["c2", "cobalt-strike"]
+        }
+      },
+      "malwarebazaar": {"source": "malwarebazaar", "status": "not_applicable", "verdict": "unknown", "confidence": "low", "summary": "MalwareBazaar only supports file hashes.", "raw": {}},
+      "urlhaus": {"source": "urlhaus", "status": "not_applicable", "verdict": "unknown", "confidence": "low", "summary": "URLhaus requires a domain or URL target.", "raw": {}},
+      "circl_pdns": {
+        "source": "circl_pdns", "status": "success", "verdict": "unknown", "confidence": "low",
+        "summary": "Found 3 pDNS record(s).",
+        "raw": {
+          "record_count": 3,
+          "records": [
+            {"rrname": "cdn-metrics.analytics-svc.com.", "rdata": "194.165.16.158", "rrtype": "A", "time_first": "2024-10-28", "time_last": "2024-11-14"},
+            {"rrname": "api-telemetry.update-svc.net.", "rdata": "194.165.16.158", "rrtype": "A", "time_first": "2024-11-05", "time_last": "2024-11-14"},
+            {"rrname": "194-165-16-158.flyservers.com.", "rdata": "194.165.16.158", "rrtype": "A", "time_first": "2020-11-18", "time_last": "2024-11-14"}
+          ]
+        }
+      },
+      "vt_passive_dns": {
+        "source": "vt_passive_dns", "status": "success", "verdict": "unknown", "confidence": "low",
+        "summary": "VirusTotal passive DNS: 2 resolution(s) found.",
+        "raw": {
+          "passive_dns": [
+            {"hostname": "cdn-metrics.analytics-svc.com", "date": "2024-10-28"},
+            {"hostname": "api-telemetry.update-svc.net", "date": "2024-11-05"}
+          ],
+          "fallback_used": null, "total_returned": 2, "api_total": 3
+        }
+      },
+      "github": {
+        "source": "github", "status": "success", "verdict": "malicious", "confidence": "medium",
+        "summary": "GitHub: 3 relevant result(s) out of 11 total.",
+        "raw": {
+          "total_count": 11, "relevant_count": 3, "filtered_count": 8,
+          "repos": [
+            {"name": "feodotracker/feodotracker", "description": "Feodo Tracker: 194.165.16.158 confirmed Cobalt Strike C2 — active since 2024-10-27, same team server version as 45.153.160.140", "url": "https://github.com/feodotracker/feodotracker", "stars": 892, "updated": "2024-11-13T00:00:00Z", "topics": ["c2", "cobalt-strike", "feodo"], "relevant": true},
+            {"name": "RedDrip7/CobaltStrikeParser", "description": "194.165.16.158:443 fingerprinted CS 4.9 watermark 0x4d34e0a5 — SAME watermark as 45.153.160.140, confirmed same operator", "url": "https://github.com/RedDrip7/CobaltStrikeParser", "stars": 1203, "updated": "2024-11-09T00:00:00Z", "topics": ["cobalt-strike", "c2"], "relevant": true},
+            {"name": "crew/apt-tracker-2024", "description": "194.165.16.158 FIN7 infrastructure — failover node paired with 45.153.160.140, both on AS209588 Flyservers", "url": "https://github.com/crew/apt-tracker-2024", "stars": 341, "updated": "2024-11-07T00:00:00Z", "topics": ["fin7", "apt"], "relevant": true}
+          ]
+        }
+      },
+      "threatfox": {
+        "source": "threatfox", "status": "success", "verdict": "malicious", "confidence": "high",
+        "summary": "ThreatFox: 3 IOC entries (max confidence 100%) — botnet_cc Cobalt Strike.",
+        "raw": {
+          "ioc_count": 3,
+          "iocs": [
+            {"id": "1291055", "ioc": "194.165.16.158:443", "ioc_type": "ip:port", "threat_type": "botnet_cc", "malware": "win.cobalt_strike", "malware_printable": "Cobalt Strike", "confidence_level": 100, "first_seen": "2024-10-27 00:00:00 UTC", "last_seen": "2024-11-13 00:00:00 UTC", "tags": ["cobalt-strike", "beacon", "fin7"], "reporter": "abuse.ch"},
+            {"id": "1291056", "ioc": "194.165.16.158:4444", "ioc_type": "ip:port", "threat_type": "botnet_cc", "malware": "win.cobalt_strike", "malware_printable": "Cobalt Strike", "confidence_level": 95, "first_seen": "2024-10-28 00:00:00 UTC", "last_seen": "2024-11-09 00:00:00 UTC", "tags": ["cobalt-strike", "c2"], "reporter": "community"},
+            {"id": "1291057", "ioc": "194.165.16.158:8080", "ioc_type": "ip:port", "threat_type": "botnet_cc", "malware": "win.cobalt_strike", "malware_printable": "Cobalt Strike", "confidence_level": 88, "first_seen": "2024-10-28 00:00:00 UTC", "last_seen": "2024-11-11 00:00:00 UTC", "tags": ["cobalt-strike", "staging"], "reporter": "community"}
+          ],
+          "malware_families": ["Cobalt Strike"], "threat_types": ["botnet_cc"], "tags": ["cobalt-strike", "beacon", "fin7"], "max_confidence_level": 100
+        }
+      },
+      "report": {
+        "verdict": "malicious", "source_confidence": 97, "llm_confidence": 94, "overall_confidence": 96,
+        "summary": "194.165.16.158 is the second Cobalt Strike team server in a coordinated C2 cluster. It runs an identical Shodan fingerprint to 45.153.160.140 (CS 4.9, ports 80/443/4444/8080), shares the same watermark hash (0x4d34e0a5), operates on the same ASN (AS209588 Flyservers S.A.), and is cross-referenced in the same OTX/ThreatFox/GitHub threat intelligence as 45.153.160.140. This is a beacon failover node — when the primary C2 is blocked, beacons fall back here via the shared malleable C2 domain api-telemetry.update-svc.net.",
+        "key_findings": [
+          "Identical Cobalt Strike fingerprint to 45.153.160.140: CS 4.9, ports 80/443/4444/8080, watermark 0x4d34e0a5 — same operator confirmed",
+          "Same ASN (AS209588 Flyservers S.A.) and same /16 network range as companion C2 IP 45.153.160.140",
+          "ThreatFox: 3 IOC entries at 88–100% confidence; AbuseIPDB: 96/100 from 53 reports",
+          "Passive DNS links this IP to both malleable C2 domains: api-telemetry.update-svc.net and cdn-metrics.analytics-svc.com",
+          "FIN7 attribution corroborated by three independent GitHub DFIR repositories"
+        ],
+        "mitre_techniques": [
+          {"technique_id": "T1071.001", "technique_name": "Application Layer Protocol: Web Protocols", "justification": "Cobalt Strike beacon using HTTPS on 443 with malleable C2 profile"},
+          {"technique_id": "T1571", "technique_name": "Non-Standard Port", "justification": "Cobalt Strike listening on 4444 and 8080 for redundant beacon channels"},
+          {"technique_id": "T1008", "technique_name": "Fallback Channels", "justification": "Second C2 node in a failover cluster paired with 45.153.160.140 via shared malleable C2 domain"}
+        ],
+        "recommended_actions": [
+          "Block 194.165.16.158 and the full /24 subnet 194.165.16.0/24 — failover C2 node, same operator as 45.153.160.140",
+          "Search SIEM for outbound connections to 194.165.16.158 on ports 443, 4444, 8080",
+          "Treat as part of a coordinated C2 cluster — blocking this IP alone is insufficient; see companion IPs and domains"
+        ],
+        "iocs_extracted": ["194.165.16.158:443", "194.165.16.158:4444", "194.165.16.158:8080", "cdn-metrics.analytics-svc.com", "api-telemetry.update-svc.net"],
+        "tlp": "AMBER",
+        "top_supporting_evidence": [
+          "Identical Cobalt Strike watermark 0x4d34e0a5 as 45.153.160.140 — cryptographically confirms same operator and license",
+          "ThreatFox: 3 IOC entries at 88–100% confidence; same ASN/hosting provider as companion C2 IP"
+        ],
+        "top_conflicting_evidence": [
+          "APT41 also named in OTX attribution alongside FIN7 — conflicting actor attribution; FIN7 is stronger given watermark correlation, but APT41 overlap cannot be excluded"
+        ]
+      },
+      "riskScore": 96
+    },
+    {
+      "target": "cdn-metrics.analytics-svc.com",
+      "input_type": "domain",
+      "whois": {
+        "registrar": "Porkbun LLC",
+        "created": "2024-10-26",
+        "expires": "2025-10-26",
+        "registrant": "REDACTED FOR PRIVACY",
+        "country": "IS",
+        "nameservers": ["ns1.flyservers-dns.net", "ns2.flyservers-dns.net"]
+      },
+      "otx": {
+        "source": "otx", "status": "success", "verdict": "malicious", "confidence": "high",
+        "summary": "Found in 9 OTX pulse(s), tagged: cobalt-strike, c2.",
+        "raw": {"pulse_count": 9, "malware_families": ["CobaltStrike"], "threat_actors": ["FIN7"], "reputation": -80, "indicator": "cdn-metrics.analytics-svc.com"}
+      },
+      "greynoise": {"source": "greynoise", "status": "not_applicable", "verdict": "unknown", "confidence": "low", "summary": "GreyNoise only supports IP address lookups.", "raw": {}},
+      "abuseipdb": {"source": "abuseipdb", "status": "not_applicable", "verdict": "unknown", "confidence": "low", "summary": "AbuseIPDB only supports IP address lookups.", "raw": {}},
+      "shodan": {"source": "shodan", "status": "not_applicable", "verdict": "unknown", "confidence": "low", "summary": "Shodan host data requires an IP address.", "raw": {}},
+      "malwarebazaar": {"source": "malwarebazaar", "status": "not_applicable", "verdict": "unknown", "confidence": "low", "summary": "MalwareBazaar only supports file hashes.", "raw": {}},
+      "urlhaus": {
+        "source": "urlhaus", "status": "success", "verdict": "malicious", "confidence": "high",
+        "summary": "URLhaus: 2 active malicious URL(s) — Cobalt Strike malleable C2.",
+        "raw": {
+          "url_count": 2, "active_count": 2, "tags": ["cobalt-strike", "c2", "malleable-c2"],
+          "urls": [
+            {"url": "https://cdn-metrics.analytics-svc.com/cdn/metrics", "status": "online", "date_added": "2024-10-30"},
+            {"url": "https://cdn-metrics.analytics-svc.com/api/report", "status": "online", "date_added": "2024-10-30"}
+          ]
+        }
+      },
+      "circl_pdns": {
+        "source": "circl_pdns", "status": "success", "verdict": "unknown", "confidence": "low",
+        "summary": "Found 2 pDNS record(s).",
+        "raw": {
+          "record_count": 2,
+          "records": [
+            {"rrname": "cdn-metrics.analytics-svc.com.", "rdata": "194.165.16.158", "rrtype": "A", "time_first": "2024-10-28", "time_last": "2024-11-14"},
+            {"rrname": "cdn-metrics.analytics-svc.com.", "rdata": "45.153.160.140", "rrtype": "A", "time_first": "2024-10-28", "time_last": "2024-11-01"}
+          ]
+        }
+      },
+      "vt_passive_dns": {
+        "source": "vt_passive_dns", "status": "success", "verdict": "unknown", "confidence": "low",
+        "summary": "VirusTotal passive DNS: 2 resolution(s) found.",
+        "raw": {
+          "passive_dns": [
+            {"hostname": "cdn-metrics.analytics-svc.com", "date": "2024-10-28"},
+            {"hostname": "cdn-metrics.analytics-svc.com", "date": "2024-11-01"}
+          ],
+          "fallback_used": null, "total_returned": 2, "api_total": 2
+        }
+      },
+      "github": {
+        "source": "github", "status": "success", "verdict": "suspicious", "confidence": "medium",
+        "summary": "GitHub: 2 relevant result(s) out of 5 total.",
+        "raw": {
+          "total_count": 5, "relevant_count": 2, "filtered_count": 3,
+          "repos": [
+            {"name": "RedDrip7/CobaltStrikeParser", "description": "cdn-metrics.analytics-svc.com — second malleable C2 domain in FIN7 cluster, resolves to 194.165.16.158 (primary) and 45.153.160.140 (failover), same watermark 0x4d34e0a5", "url": "https://github.com/RedDrip7/CobaltStrikeParser", "stars": 1203, "updated": "2024-11-10T00:00:00Z", "topics": ["cobalt-strike"], "relevant": true},
+            {"name": "crew/apt-tracker-2024", "description": "FIN7 C2 domain — cdn-metrics.analytics-svc.com impersonates CDN analytics, paired with api-telemetry.update-svc.net as secondary C2 domain", "url": "https://github.com/crew/apt-tracker-2024", "stars": 341, "updated": "2024-11-08T00:00:00Z", "topics": ["fin7", "c2"], "relevant": true}
+          ]
+        }
+      },
+      "threatfox": {
+        "source": "threatfox", "status": "success", "verdict": "malicious", "confidence": "high",
+        "summary": "ThreatFox: 1 IOC entry (confidence 92%) — botnet_cc Cobalt Strike.",
+        "raw": {
+          "ioc_count": 1,
+          "iocs": [{"id": "1291065", "ioc": "cdn-metrics.analytics-svc.com", "ioc_type": "domain", "threat_type": "botnet_cc", "malware": "win.cobalt_strike", "malware_printable": "Cobalt Strike", "confidence_level": 92, "first_seen": "2024-10-30 00:00:00 UTC", "last_seen": "2024-11-14 00:00:00 UTC", "tags": ["cobalt-strike", "malleable-c2", "fin7"], "reporter": "abuse.ch"}],
+          "malware_families": ["Cobalt Strike"], "threat_types": ["botnet_cc"], "tags": ["cobalt-strike", "malleable-c2", "fin7"], "max_confidence_level": 92
+        }
+      },
+      "report": {
+        "verdict": "malicious", "source_confidence": 91, "llm_confidence": 90, "overall_confidence": 91,
+        "summary": "cdn-metrics.analytics-svc.com is the second Cobalt Strike malleable C2 domain in a coordinated FIN7 C2 cluster. Registered the same day as companion domain api-telemetry.update-svc.net (October 26, 2024), it uses identical registrar (Porkbun), privacy service, and nameservers (ns1/2.flyservers-dns.net). It resolves to both confirmed C2 IPs (194.165.16.158 and 45.153.160.140), making it the secondary beacon domain in a four-node failover cluster.",
+        "key_findings": [
+          "Registered same day (2024-10-26) as companion domain api-telemetry.update-svc.net — identical registrar, privacy, and nameservers",
+          "Resolves to both C2 IPs (194.165.16.158 primary, 45.153.160.140 failover) — confirms role in four-node C2 cluster",
+          "ThreatFox: botnet_cc Cobalt Strike at 92% confidence",
+          "Same watermark 0x4d34e0a5 correlation confirmed by DFIR researchers — same FIN7 operator as all other cluster nodes",
+          "Domain mimics CDN analytics endpoint — classic malleable C2 legitimacy masquerade"
+        ],
+        "mitre_techniques": [
+          {"technique_id": "T1071.001", "technique_name": "Application Layer Protocol: Web Protocols", "justification": "Malleable C2 domain impersonating CDN analytics over HTTPS to blend with legitimate traffic"},
+          {"technique_id": "T1008", "technique_name": "Fallback Channels", "justification": "Second C2 domain in a dual-domain failover configuration with api-telemetry.update-svc.net"},
+          {"technique_id": "T1583.001", "technique_name": "Acquire Infrastructure: Domains", "justification": "Registered same day as companion C2 domain via same registrar — coordinated infrastructure provisioning"}
+        ],
+        "recommended_actions": [
+          "Block cdn-metrics.analytics-svc.com and the parent domain analytics-svc.com at DNS — impersonates CDN traffic to evade detection",
+          "Search DNS logs for queries to analytics-svc.com or update-svc.net — both are confirmed C2 parent domains in this cluster",
+          "Treat as part of a four-node C2 cluster — see 45.153.160.140, 194.165.16.158, and api-telemetry.update-svc.net"
+        ],
+        "iocs_extracted": ["194.165.16.158", "45.153.160.140", "api-telemetry.update-svc.net", "analytics-svc.com", "update-svc.net"],
+        "tlp": "AMBER",
+        "top_supporting_evidence": [
+          "Same-day registration as companion C2 domain with identical registrar/nameservers — automated coordinated infrastructure provisioning",
+          "ThreatFox: botnet_cc Cobalt Strike 92% confidence; resolves to both confirmed C2 team server IPs"
+        ],
+        "top_conflicting_evidence": []
+      },
+      "riskScore": 91
+    }
+  ],
+  "campaign_report": {
+    "campaign_verdict": "coordinated_malicious",
+    "confidence": 98,
+    "summary": "These four indicators form a tightly coordinated Cobalt Strike C2 cluster attributed to FIN7 with near-certainty. The two C2 IPs (45.153.160.140 and 194.165.16.158) are on the same ASN (AS209588 Flyservers S.A.), running identical software (Cobalt Strike 4.9), identical port profiles (80/443/4444/8080), and share the same beacon watermark hash (0x4d34e0a5) — cryptographic proof of a single operator. The two malleable C2 domains were registered on the same day via the same registrar (Porkbun, IS privacy) and nameservers (flyservers-dns.net), and cross-resolve to both IPs forming a four-node failover architecture. All four indicators appear in the same Feodo Tracker, ThreatFox, and DFIR GitHub attribution reports. This is a fully operational post-exploitation infrastructure: compromise of any endpoint beaconing to these indicators should be treated as a confirmed intrusion with lateral movement risk.",
+    "shared_patterns": [
+      "Both C2 IPs on identical ASN: AS209588 (Flyservers S.A., Panama) — same hosting provider, same /24 subnets",
+      "Both C2 IPs fingerprinted as Cobalt Strike Team Server 4.9 with identical port profile: 80, 443, 4444, 8080 — same server configuration",
+      "Identical Cobalt Strike watermark 0x4d34e0a5 on both IPs (45.153.160.140 and 194.165.16.158) — cryptographic proof of single operator and license",
+      "Both malleable C2 domains registered same day (2024-10-26) via Porkbun with Icelandic privacy service and identical nameservers (ns1/2.flyservers-dns.net) — automated infrastructure provisioning",
+      "Cross-resolution: both domains resolve to both IPs — fully interconnected failover beacon architecture",
+      "All four indicators appear in the same Feodo Tracker campaign entry and two independent DFIR GitHub repositories (RedDrip7/CobaltStrikeParser, crew/apt-tracker-2024) with FIN7 attribution"
+    ],
+    "infrastructure_map": {
+      "c2": [
+        "45.153.160.140",
+        "194.165.16.158"
+      ],
+      "delivery": [],
+      "exfiltration": [],
+      "unknown": [
+        "api-telemetry.update-svc.net",
+        "cdn-metrics.analytics-svc.com"
+      ]
+    },
+    "threat_actor_hypothesis": "FIN7 (also tracked as Carbanak, Navigator Group). Attribution is based on: (1) Cobalt Strike watermark 0x4d34e0a5 previously observed in confirmed FIN7 campaigns by Mandiant and independent DFIR researchers; (2) Flyservers S.A. (AS209588) is a known FIN7 hosting preference documented in public threat reporting; (3) malleable C2 domain naming conventions (impersonating telemetry and CDN endpoints) match FIN7 operational playbook. FIN7 is a financially motivated threat actor historically targeting retail, hospitality, and financial sectors with Cobalt Strike for post-exploitation and lateral movement prior to data exfiltration.",
+    "mitre_techniques": [
+      {"technique_id": "T1071.001", "technique_name": "Application Layer Protocol: Web Protocols", "justification": "Both malleable C2 domains use HTTPS to blend Cobalt Strike beacon traffic with legitimate web traffic on both C2 IPs"},
+      {"technique_id": "T1571", "technique_name": "Non-Standard Port", "justification": "Both C2 IPs expose port 4444 alongside standard ports for redundant beacon channels"},
+      {"technique_id": "T1008", "technique_name": "Fallback Channels", "justification": "Full failover architecture: 2 IPs × 2 domains cross-resolved, providing 4 redundant C2 paths"},
+      {"technique_id": "T1583.003", "technique_name": "Acquire Infrastructure: Virtual Private Server", "justification": "Both C2 IPs provisioned on AS209588 Flyservers S.A. — consistent with FIN7 VPS hosting preferences"},
+      {"technique_id": "T1583.001", "technique_name": "Acquire Infrastructure: Domains", "justification": "Two malleable C2 domains registered same-day via same registrar — automated coordinated provisioning"},
+      {"technique_id": "T1090.001", "technique_name": "Proxy: Internal Proxy", "justification": "nginx on port 80/8080 on both C2 IPs acts as traffic redirector fronting the Cobalt Strike listener"}
+    ],
+    "recommended_actions": [
+      "Block all four indicators at perimeter firewall and DNS resolver immediately — treat any connection as an active intrusion",
+      "Search SIEM for outbound connections to 45.153.160.140 and 194.165.16.158 on ports 443, 4444, and 8080 over the last 90 days — any hit confirms a beaconing endpoint",
+      "Search DNS logs for queries to api-telemetry.update-svc.net, cdn-metrics.analytics-svc.com, and their parent domains update-svc.net and analytics-svc.com — any query indicates an infected host",
+      "If beacon traffic is found: initiate full incident response — FIN7 TTPs include credential theft, lateral movement, and data exfiltration prior to monetization",
+      "Hunt for Cobalt Strike beacon artifacts with watermark 0x4d34e0a5 across EDR telemetry using YARA or beacon configuration extraction tools (e.g. 1768.py)",
+      "Block the full AS209588 (Flyservers S.A.) IP ranges — 45.153.160.0/24 and 194.165.16.0/24 — this ASN has documented FIN7 hosting history",
+      "Submit all four indicators and the watermark hash to your threat intel platform and coordinate with sector ISAC for peer notification"
+    ]
+  }
+}
