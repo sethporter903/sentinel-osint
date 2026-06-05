@@ -206,14 +206,18 @@ async def analyze_batch(body: BatchRequest):
 
 
 # ── Router mounts ─────────────────────────────────────────────────────────────
-# Include routes at root (for local dev — Vite proxy strips /api before hitting here)
-# and at /api (for production — frontend calls /api/... directly).
-app.include_router(router)
+_FRONTEND_DIST = Path(__file__).parent.parent / "frontend" / "dist"
+
+# Always expose routes at /api (used by the built frontend in production).
 app.include_router(router, prefix="/api")
 
+# In local dev the built frontend doesn't exist, so also mount routes at /
+# (Vite's dev-server proxy strips /api before forwarding to this server).
+if not _FRONTEND_DIST.exists():
+    app.include_router(router)
+
 # ── Frontend static files (production only) ───────────────────────────────────
-# Serve the built React app from frontend/dist when it exists.
-# This catch-all must come AFTER all API route registrations.
-_FRONTEND_DIST = Path(__file__).parent.parent / "frontend" / "dist"
+# Serve the built React SPA. Must come AFTER all API route registrations so
+# API paths are matched first; everything else falls through to index.html.
 if _FRONTEND_DIST.exists():
     app.mount("/", StaticFiles(directory=str(_FRONTEND_DIST), html=True), name="frontend")
