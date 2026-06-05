@@ -2,6 +2,16 @@
 
 **LLM-assisted indicator of compromise enrichment across 10 concurrent intelligence sources**
 
+---
+
+## 🔴 Live Demo
+
+**[sentinel-osint-r7fv.onrender.com](https://sentinel-osint-r7fv.onrender.com)**
+
+> ⚠️ Hosted on Render's free tier — allow ~30 seconds for cold start if the app has been inactive.
+
+---
+
 [![Python](https://img.shields.io/badge/Python-3.11+-blue)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/Frontend-React-61DAFB)](https://react.dev)
@@ -257,7 +267,7 @@ Query only targets you are authorized to research. Public availability of data d
 - [x] Prompt injection demonstration and mitigation (v1)
 - [ ] STIX 2.1 structured report output
 - [ ] HaveIBeenPwned integration in v2
-- [ ] Deployed live demo
+- [x] Deployed live demo ([sentinel-osint-r7fv.onrender.com](https://sentinel-osint-r7fv.onrender.com))
 
 ---
 
