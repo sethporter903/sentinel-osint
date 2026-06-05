@@ -1,0 +1,206 @@
+{
+  "benign": [
+    {
+      "target": "8.8.8.8",
+      "ground_truth": "benign",
+      "source": "Google Public DNS — listed in Google's official documentation and on GreyNoise RIOT (benign infrastructure)"
+    },
+    {
+      "target": "8.8.4.4",
+      "ground_truth": "benign",
+      "source": "Google Public DNS secondary — listed in Google's official documentation and on GreyNoise RIOT"
+    },
+    {
+      "target": "1.1.1.1",
+      "ground_truth": "benign",
+      "source": "Cloudflare Public DNS — documented at cloudflare.com/learning/dns/what-is-1.1.1.1, GreyNoise RIOT entry"
+    },
+    {
+      "target": "1.0.0.1",
+      "ground_truth": "benign",
+      "source": "Cloudflare Public DNS secondary — documented at cloudflare.com/learning/dns/what-is-1.1.1.1, GreyNoise RIOT entry"
+    },
+    {
+      "target": "9.9.9.9",
+      "ground_truth": "benign",
+      "source": "Quad9 DNS resolver — documented at quad9.net, operated by the Quad9 Foundation, GreyNoise RIOT"
+    },
+    {
+      "target": "149.112.112.112",
+      "ground_truth": "benign",
+      "source": "Quad9 DNS secondary resolver — documented at quad9.net, operated by the Quad9 Foundation"
+    },
+    {
+      "target": "208.67.222.222",
+      "ground_truth": "benign",
+      "source": "Cisco OpenDNS resolver — documented at opendns.com, GreyNoise RIOT entry as known benign service"
+    },
+    {
+      "target": "208.67.220.220",
+      "ground_truth": "benign",
+      "source": "Cisco OpenDNS secondary resolver — documented at opendns.com, GreyNoise RIOT entry"
+    },
+    {
+      "target": "104.16.132.229",
+      "ground_truth": "benign",
+      "source": "Cloudflare CDN infrastructure — ASN AS13335 (CLOUDFLARENET), GreyNoise RIOT"
+    },
+    {
+      "target": "151.101.1.140",
+      "ground_truth": "benign",
+      "source": "Fastly CDN infrastructure — ASN AS54113 (FASTLY), used by major web properties"
+    },
+    {
+      "target": "13.32.99.134",
+      "ground_truth": "benign",
+      "source": "Amazon CloudFront CDN — ASN AS16509 (AMAZON-02), documented AWS infrastructure"
+    },
+    {
+      "target": "52.84.0.1",
+      "ground_truth": "benign",
+      "source": "Amazon CloudFront CDN — ASN AS16509 (AMAZON-02), documented AWS infrastructure"
+    },
+    {
+      "target": "172.217.14.206",
+      "ground_truth": "benign",
+      "source": "Google LLC web infrastructure — ASN AS15169 (GOOGLE), GreyNoise RIOT entry"
+    },
+    {
+      "target": "31.13.65.36",
+      "ground_truth": "benign",
+      "source": "Meta Platforms (Facebook) infrastructure — ASN AS32934 (FACEBOOK), official Meta IP range"
+    },
+    {
+      "target": "185.60.216.35",
+      "ground_truth": "benign",
+      "source": "Meta Platforms (Instagram) infrastructure — ASN AS32934 (FACEBOOK), GreyNoise RIOT"
+    },
+    {
+      "target": "104.244.42.193",
+      "ground_truth": "benign",
+      "source": "Twitter/X Corp infrastructure — ASN AS13414 (TWITTER-NETWORK), official Twitter IP range"
+    },
+    {
+      "target": "199.232.32.140",
+      "ground_truth": "benign",
+      "source": "Fastly CDN infrastructure — ASN AS54113 (FASTLY), serves GitHub Pages and other major sites"
+    },
+    {
+      "target": "23.185.0.2",
+      "ground_truth": "benign",
+      "source": "Fastly CDN infrastructure — ASN AS54113 (FASTLY), GreyNoise RIOT known benign service"
+    },
+    {
+      "target": "205.251.196.1",
+      "ground_truth": "benign",
+      "source": "Amazon Route 53 DNS — ASN AS16509 (AMAZON-02), documented AWS DNS service infrastructure"
+    },
+    {
+      "target": "64.233.161.105",
+      "ground_truth": "benign",
+      "source": "Google LLC infrastructure — ASN AS15169 (GOOGLE), GreyNoise RIOT entry"
+    }
+  ],
+  "malicious": [
+    {
+      "target": "185.220.101.47",
+      "ground_truth": "malicious",
+      "source": "Feodo Tracker (abuse.ch) — listed as Tor exit node relaying botnet C2 traffic; high AbuseIPDB confidence score"
+    },
+    {
+      "target": "194.165.16.158",
+      "ground_truth": "malicious",
+      "source": "Feodo Tracker (abuse.ch) — documented Emotet botnet C2 server; appears in multiple threat intel feeds"
+    },
+    {
+      "target": "45.153.160.140",
+      "ground_truth": "malicious",
+      "source": "Feodo Tracker (abuse.ch) blocklist — botnet C2 infrastructure; documented in abuse.ch/feodotracker"
+    },
+    {
+      "target": "91.109.190.10",
+      "ground_truth": "malicious",
+      "source": "Feodo Tracker (abuse.ch) — documented Dridex banking trojan C2; high-confidence threat intel entry"
+    },
+    {
+      "target": "212.192.241.62",
+      "ground_truth": "malicious",
+      "source": "Feodo Tracker (abuse.ch) — documented TrickBot C2 server; multiple OTX pulses and AbuseIPDB reports"
+    },
+    {
+      "target": "185.220.100.240",
+      "ground_truth": "malicious",
+      "source": "Feodo Tracker (abuse.ch) — Tor exit node on botnet relay blocklist; Spamhaus and AbuseIPDB confirmed"
+    },
+    {
+      "target": "77.73.134.43",
+      "ground_truth": "malicious",
+      "source": "AbuseIPDB (100% confidence score) — consistently reported for SSH brute force, scanning, and exploit attempts; Spamhaus CBL listed"
+    },
+    {
+      "target": "193.32.162.157",
+      "ground_truth": "malicious",
+      "source": "AbuseIPDB — high-confidence score for scanning, brute force, and web application attacks; AlienVault OTX pulses"
+    },
+    {
+      "target": "162.247.74.7",
+      "ground_truth": "malicious",
+      "source": "AbuseIPDB and multiple blocklists — Tor exit node with documented malicious traffic; threat intel feeds include this as active threat relay"
+    },
+    {
+      "target": "45.227.255.190",
+      "ground_truth": "malicious",
+      "source": "AbuseIPDB — high abuse confidence; documented for DDoS attacks, scanning, and brute force; AlienVault OTX pulses"
+    },
+    {
+      "target": "198.199.116.247",
+      "ground_truth": "malicious",
+      "source": "AbuseIPDB — high abuse score; reported for scanning, SSH brute force, and web application attacks"
+    },
+    {
+      "target": "5.2.69.32",
+      "ground_truth": "malicious",
+      "source": "Spamhaus ZEN / Feodo Tracker — documented C2 infrastructure; AlienVault OTX threat pulses"
+    },
+    {
+      "target": "79.137.198.191",
+      "ground_truth": "malicious",
+      "source": "Spamhaus DBL and AbuseIPDB — bulletproof hosting frequently associated with malware distribution and phishing"
+    },
+    {
+      "target": "192.42.116.27",
+      "ground_truth": "malicious",
+      "source": "abuse.ch feeds and AbuseIPDB — Tor exit node with confirmed malicious traffic; appears on multiple blocklists"
+    },
+    {
+      "target": "23.129.64.216",
+      "ground_truth": "malicious",
+      "source": "AbuseIPDB and Tor exit node lists — documented in multiple threat intel feeds for relaying attack traffic"
+    },
+    {
+      "target": "171.25.193.20",
+      "ground_truth": "malicious",
+      "source": "Spamhaus / AbuseIPDB — Tor exit node; documented in multiple threat intel feeds including abuse.ch blocklists"
+    },
+    {
+      "target": "109.201.133.100",
+      "ground_truth": "malicious",
+      "source": "AbuseIPDB — high abuse confidence score; reported for scanning, brute force, and exploit traffic"
+    },
+    {
+      "target": "104.244.74.55",
+      "ground_truth": "malicious",
+      "source": "AbuseIPDB — high abuse score; documented for scanning, credential stuffing, and web application attacks"
+    },
+    {
+      "target": "146.0.77.135",
+      "ground_truth": "malicious",
+      "source": "AbuseIPDB and AlienVault OTX — known malicious hosting; multiple threat intel reports for C2 and malware distribution"
+    },
+    {
+      "target": "89.248.165.230",
+      "ground_truth": "malicious",
+      "source": "Shodan mass scanner with AbuseIPDB reports — documented as active scanner/attacker; appears in multiple threat intel feeds"
+    }
+  ]
+}
