@@ -258,6 +258,207 @@ function buildIndicators(result) {
   return out;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Campaign Results component
+// ─────────────────────────────────────────────────────────────────────────────
+
+const INFRA_ROLES = [
+  { key: "c2",          label: "Command & Control", icon: "📡", color: "#ff4444", glow: "#ff444433" },
+  { key: "delivery",    label: "Delivery",           icon: "📬", color: "#ff8c42", glow: "#ff8c4233" },
+  { key: "exfiltration",label: "Exfiltration",       icon: "📤", color: "#ffd700", glow: "#ffd70033" },
+  { key: "unknown",     label: "Unclassified",       icon: "❓", color: "#666",    glow: "#66666633" },
+];
+
+const CAMPAIGN_VERDICT_STYLE = {
+  coordinated_malicious: { color: "#ff4444", bg: "#ff444415", border: "#ff444444", label: "COORDINATED MALICIOUS" },
+  likely_related:        { color: "#ff8c42", bg: "#ff8c4215", border: "#ff8c4244", label: "LIKELY RELATED"        },
+  unrelated:             { color: "#00e676", bg: "#00e67615", border: "#00e67644", label: "UNRELATED"             },
+  unknown:               { color: "#888",    bg: "#88888815", border: "#88888844", label: "UNKNOWN"               },
+};
+
+function CampaignResults({ report, targets, onReset }) {
+  const verdictKey = report.campaign_verdict || "unknown";
+  const vstyle = CAMPAIGN_VERDICT_STYLE[verdictKey] || CAMPAIGN_VERDICT_STYLE.unknown;
+  const infraMap = report.infrastructure_map || {};
+
+  return (
+    <div>
+      {/* Header bar */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
+        <div>
+          <div style={{ color: "#555", fontSize: "11px", fontFamily: "'JetBrains Mono', monospace", marginBottom: "4px" }}>
+            CAMPAIGN ANALYSIS COMPLETE · {new Date().toUTCString()}
+          </div>
+          <div style={{ color: "#fff", fontSize: "20px", fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif" }}>
+            {targets.length} Indicator{targets.length !== 1 ? "s" : ""} Analyzed
+          </div>
+        </div>
+        <button onClick={onReset} style={{
+          background: "#111418", border: "1px solid #ffffff15", borderRadius: "6px",
+          padding: "8px 16px", color: "#888", fontSize: "13px", cursor: "pointer",
+        }}>
+          ← New Analysis
+        </button>
+      </div>
+
+      {/* Verdict banner */}
+      <div style={{
+        background: vstyle.bg, border: `1px solid ${vstyle.border}`,
+        borderRadius: "10px", padding: "20px 24px", marginBottom: "20px",
+        display: "flex", alignItems: "center", gap: "20px",
+      }}>
+        <div>
+          <div style={{ color: "#555", fontSize: "10px", letterSpacing: "0.12em", fontFamily: "'JetBrains Mono', monospace", marginBottom: "4px" }}>
+            CAMPAIGN VERDICT
+          </div>
+          <div style={{ color: vstyle.color, fontSize: "22px", fontWeight: 800, fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.04em" }}>
+            {vstyle.label}
+          </div>
+        </div>
+        <div style={{ marginLeft: "auto", textAlign: "right" }}>
+          <div style={{ color: "#555", fontSize: "10px", letterSpacing: "0.1em", fontFamily: "'JetBrains Mono', monospace", marginBottom: "4px" }}>
+            CONFIDENCE
+          </div>
+          <div style={{ color: vstyle.color, fontSize: "28px", fontWeight: 800, fontFamily: "'JetBrains Mono', monospace" }}>
+            {report.confidence ?? "—"}%
+          </div>
+        </div>
+      </div>
+
+      {/* Summary */}
+      <div style={{ background: "#0d1017", border: "1px solid #ffffff10", borderRadius: "10px", padding: "20px 24px", marginBottom: "16px" }}>
+        <div style={{ color: "#555", fontSize: "11px", letterSpacing: "0.1em", fontFamily: "'JetBrains Mono', monospace", marginBottom: "10px" }}>
+          ASSESSMENT
+        </div>
+        <p style={{ color: "#ccc", fontSize: "14px", lineHeight: "1.8", margin: 0, fontFamily: "Georgia, serif" }}>
+          {report.summary}
+        </p>
+      </div>
+
+      {/* Infrastructure map — grouped cards */}
+      <div style={{ marginBottom: "16px" }}>
+        <div style={{ color: "#555", fontSize: "11px", letterSpacing: "0.1em", fontFamily: "'JetBrains Mono', monospace", marginBottom: "12px" }}>
+          INFRASTRUCTURE MAP
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "12px" }}>
+          {INFRA_ROLES.map(role => {
+            const indicators = infraMap[role.key] || [];
+            return (
+              <div key={role.key} style={{
+                background: "#0d1017", border: `1px solid ${indicators.length > 0 ? role.glow : "#ffffff08"}`,
+                borderRadius: "10px", padding: "16px",
+                opacity: indicators.length === 0 ? 0.45 : 1,
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
+                  <span style={{ fontSize: "16px" }}>{role.icon}</span>
+                  <span style={{ color: role.color, fontSize: "12px", fontWeight: 700, letterSpacing: "0.08em", fontFamily: "'JetBrains Mono', monospace" }}>
+                    {role.label.toUpperCase()}
+                  </span>
+                  <span style={{ marginLeft: "auto", color: "#444", fontSize: "11px", fontFamily: "'JetBrains Mono', monospace" }}>
+                    {indicators.length}
+                  </span>
+                </div>
+                {indicators.length === 0 ? (
+                  <div style={{ color: "#333", fontSize: "12px", fontFamily: "'JetBrains Mono', monospace", fontStyle: "italic" }}>
+                    none identified
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    {indicators.map((ind, i) => (
+                      <div key={i} style={{
+                        background: "#111418", borderRadius: "5px", padding: "6px 10px",
+                        color: "#e0e0e0", fontSize: "12px", fontFamily: "'JetBrains Mono', monospace",
+                        wordBreak: "break-all", borderLeft: `2px solid ${role.color}55`,
+                      }}>
+                        {ind}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Shared patterns */}
+      {(report.shared_patterns || []).length > 0 && (
+        <div style={{ background: "#0d1017", border: "1px solid #ffffff10", borderRadius: "10px", padding: "20px 24px", marginBottom: "16px" }}>
+          <div style={{ color: "#00e5ff", fontSize: "11px", letterSpacing: "0.1em", fontFamily: "'JetBrains Mono', monospace", marginBottom: "12px" }}>
+            SHARED PATTERNS
+          </div>
+          {report.shared_patterns.map((p, i) => (
+            <div key={i} style={{ marginBottom: "8px", paddingLeft: "12px", borderLeft: "2px solid #00e5ff44", color: "#ccc", fontSize: "13px" }}>
+              • {p}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Threat actor hypothesis */}
+      {report.threat_actor_hypothesis && (
+        <div style={{ background: "#0d1017", border: "1px solid #ffffff10", borderRadius: "10px", padding: "20px 24px", marginBottom: "16px" }}>
+          <div style={{ color: "#ffd700", fontSize: "11px", letterSpacing: "0.1em", fontFamily: "'JetBrains Mono', monospace", marginBottom: "10px" }}>
+            THREAT ACTOR HYPOTHESIS
+          </div>
+          <div style={{ color: "#ccc", fontSize: "13px", lineHeight: "1.7" }}>
+            {report.threat_actor_hypothesis}
+          </div>
+        </div>
+      )}
+
+      {/* MITRE + Actions side by side */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "16px" }}>
+        {(report.mitre_techniques || []).length > 0 && (
+          <div style={{ background: "#0d1017", border: "1px solid #ffffff10", borderRadius: "10px", padding: "20px 24px" }}>
+            <div style={{ color: "#00e5ff", fontSize: "11px", letterSpacing: "0.1em", fontFamily: "'JetBrains Mono', monospace", marginBottom: "12px" }}>
+              MITRE ATT&CK
+            </div>
+            {report.mitre_techniques.map((t, i) => (
+              <div key={i} style={{ marginBottom: "10px" }}>
+                <div style={{ color: "#00e5ff", fontSize: "11px", fontFamily: "'JetBrains Mono', monospace", marginBottom: "2px" }}>
+                  {t.technique_id} · {t.technique_name}
+                </div>
+                <div style={{ color: "#666", fontSize: "11px" }}>{t.justification}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {(report.recommended_actions || []).length > 0 && (
+          <div style={{ background: "#0d1017", border: "1px solid #ffffff10", borderRadius: "10px", padding: "20px 24px" }}>
+            <div style={{ color: "#00e5ff", fontSize: "11px", letterSpacing: "0.1em", fontFamily: "'JetBrains Mono', monospace", marginBottom: "12px" }}>
+              RECOMMENDED ACTIONS
+            </div>
+            {report.recommended_actions.map((a, i) => (
+              <div key={i} style={{ marginBottom: "8px", paddingLeft: "12px", borderLeft: "2px solid #ffffff22", color: "#ccc", fontSize: "13px" }}>
+                • {a}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Target list */}
+      <div style={{ background: "#0d1017", border: "1px solid #ffffff08", borderRadius: "10px", padding: "16px 24px" }}>
+        <div style={{ color: "#444", fontSize: "11px", letterSpacing: "0.1em", fontFamily: "'JetBrains Mono', monospace", marginBottom: "10px" }}>
+          ANALYZED INDICATORS ({targets.length})
+        </div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+          {targets.map(t => (
+            <span key={t} style={{
+              background: "#111418", border: "1px solid #ffffff10", borderRadius: "4px",
+              padding: "4px 10px", color: "#888", fontSize: "12px", fontFamily: "'JetBrains Mono', monospace",
+            }}>
+              {t}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function OSINTDemo() {
   const [target, setTarget] = useState("");
   const [targetType, setTargetType] = useState("auto");
@@ -269,6 +470,8 @@ export default function OSINTDemo() {
   const [isDemoMode, setIsDemoMode] = useState(false);
   const [demoTargetList, setDemoTargetList] = useState([]);
   const [demoError, setDemoError] = useState(null);
+  const [campaignMode, setCampaignMode] = useState(false);
+  const [campaignText, setCampaignText] = useState("");
   const logRef = useRef(null);
 
   // Fetch backend config once on mount to determine demo mode
@@ -345,10 +548,69 @@ const runScan = async (t) => {
   const reset = () => {
     setPhase("idle");
     setTarget("");
+    setCampaignText("");
     setCompletedSteps([]);
     setCurrentStep(null);
     setResult(null);
     setDemoError(null);
+  };
+
+  const runCampaign = async () => {
+    const lines = campaignText.split("\n").map(l => l.trim()).filter(Boolean);
+    if (lines.length === 0) return;
+
+    setPhase("scanning");
+    setCompletedSteps([]);
+    setCurrentStep(null);
+    setResult(null);
+    setActiveTab("summary");
+    setDemoError(null);
+
+    // Animate steps — campaign has its own step label
+    const campaignSteps = [
+      ...STEPS.slice(0, -1),
+      { id: "llm", label: "Generating Campaign Report", icon: "🤖", duration: 2200 },
+    ];
+    for (let i = 0; i < campaignSteps.length; i++) {
+      const step = campaignSteps[i];
+      setCurrentStep(step.id);
+      await new Promise(r => setTimeout(r, step.duration));
+      setCompletedSteps(prev => [...prev, step.id]);
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 300_000);
+
+    try {
+      const response = await fetch("/api/analyze/campaign", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ targets: lines }),
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      const data = await response.json();
+      if (data.error) {
+        setDemoError(data.error);
+        setCurrentStep(null);
+        setPhase("idle");
+        return;
+      }
+      setResult(data);
+    } catch (err) {
+      clearTimeout(timeoutId);
+      setDemoError(
+        err.name === "AbortError"
+          ? "Campaign analysis timed out — try fewer indicators."
+          : "Could not reach the analysis server. Is the backend running?"
+      );
+      setCurrentStep(null);
+      setPhase("idle");
+      return;
+    }
+
+    setCurrentStep(null);
+    setPhase("results");
   };
 const exportJSON = () => {
     const blob = new Blob([JSON.stringify(result, null, 2)], { type: "application/json" });
@@ -462,62 +724,134 @@ const exportJSON = () => {
 
         {/* Input Section */}
         <div style={{ marginBottom: "32px" }}>
-          <div style={{ fontSize: "24px", fontWeight: 700, color: "#fff", marginBottom: "4px" }}>
-            Threat Intelligence Lookup
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "4px" }}>
+            <div style={{ fontSize: "24px", fontWeight: 700, color: "#fff" }}>
+              {campaignMode ? "Campaign Analysis" : "Threat Intelligence Lookup"}
+            </div>
+            {/* Mode toggle */}
+            <div style={{
+              display: "flex", background: "#111418", border: "1px solid #ffffff15",
+              borderRadius: "8px", padding: "3px", gap: "2px",
+            }}>
+              {[
+                { id: false, label: "Single Target" },
+                { id: true,  label: "Campaign Analysis" },
+              ].map(({ id, label }) => (
+                <button
+                  key={String(id)}
+                  onClick={() => { setCampaignMode(id); reset(); }}
+                  style={{
+                    background: campaignMode === id ? "#0070f3" : "none",
+                    border: "none", borderRadius: "6px", padding: "6px 14px",
+                    color: campaignMode === id ? "#fff" : "#555",
+                    fontSize: "12px", fontWeight: campaignMode === id ? 600 : 400,
+                    cursor: "pointer", transition: "all 0.15s",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
           <div style={{ color: "#555", fontSize: "13px", marginBottom: "24px" }}>
-            Aggregate OSINT from WHOIS, passive DNS, GitHub, AbuseIPDB, and threat intelligence feeds
+            {campaignMode
+              ? "Submit a collection of related indicators to receive a unified campaign-level assessment"
+              : "Aggregate OSINT from WHOIS, passive DNS, GitHub, AbuseIPDB, and threat intelligence feeds"}
           </div>
 
-          <div style={{ display: "flex", gap: "8px", marginBottom: "16px" }}>
-            <div style={{
-              flex: 1, display: "flex", alignItems: "center",
-              background: "#111418", border: "1px solid #ffffff15",
-              borderRadius: "8px", padding: "0 16px",
-              transition: "border-color 0.2s",
-            }}>
-              <span style={{ color: "#333", marginRight: "10px", fontSize: "14px" }}>$</span>
-              <input
-                value={target}
-                onChange={e => setTarget(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && runScan()}
-                placeholder="domain.com, IP address, username..."
+          {campaignMode ? (
+            /* Campaign textarea input */
+            <div>
+              <div style={{ color: "#666", fontSize: "12px", fontFamily: "'JetBrains Mono', monospace", marginBottom: "8px" }}>
+                Enter related indicators from the same incident
+              </div>
+              <textarea
+                value={campaignText}
+                onChange={e => setCampaignText(e.target.value)}
+                placeholder={"185.220.101.47\nmalicious-domain.xyz\nabc123def456abc123def456abc123def456abc123def456abc123def456abc123de"}
+                rows={6}
                 style={{
-                  flex: 1, background: "none", border: "none", outline: "none",
-                  color: "#e0e0e0", fontSize: "14px", fontFamily: "'JetBrains Mono', monospace",
-                  padding: "14px 0",
+                  width: "100%", background: "#111418", border: "1px solid #ffffff15",
+                  borderRadius: "8px", padding: "14px 16px", color: "#e0e0e0",
+                  fontSize: "13px", fontFamily: "'JetBrains Mono', monospace",
+                  outline: "none", resize: "vertical", boxSizing: "border-box",
+                  lineHeight: 1.6,
                 }}
               />
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "10px" }}>
+                <div style={{ color: "#444", fontSize: "11px", fontFamily: "'JetBrains Mono', monospace" }}>
+                  {campaignText.split("\n").filter(l => l.trim()).length} indicator(s) · IPs, domains, and hashes supported
+                </div>
+                <button
+                  onClick={runCampaign}
+                  disabled={phase === "scanning" || !campaignText.trim()}
+                  style={{
+                    background: phase === "scanning" ? "#0a3a50" : "linear-gradient(135deg, #7928ca, #0070f3)",
+                    border: "none", borderRadius: "8px", padding: "10px 24px",
+                    color: "#fff", fontSize: "14px", fontWeight: 600,
+                    cursor: phase === "scanning" ? "not-allowed" : "pointer",
+                    opacity: !campaignText.trim() ? 0.4 : 1,
+                    boxShadow: phase !== "scanning" && campaignText.trim() ? "0 0 20px #7928ca44" : "none",
+                    transition: "all 0.2s",
+                  }}
+                >
+                  {phase === "scanning" ? "Analyzing..." : "Analyze Campaign →"}
+                </button>
+              </div>
             </div>
-            <select
-              value={targetType}
-              onChange={e => setTargetType(e.target.value)}
-              style={{
-                background: "#111418", border: "1px solid #ffffff15", color: "#888",
-                borderRadius: "8px", padding: "0 12px", fontSize: "13px",
-                fontFamily: "'JetBrains Mono', monospace", cursor: "pointer",
-              }}
-            >
-              <option value="auto">auto-detect</option>
-              <option value="domain">domain</option>
-              <option value="ip">ip</option>
-              <option value="username">username</option>
-            </select>
-            <button
-              onClick={() => runScan()}
-              disabled={phase === "scanning" || !target.trim()}
-              style={{
-                background: phase === "scanning" ? "#0a3a50" : "linear-gradient(135deg, #0070f3, #00e5ff)",
-                border: "none", borderRadius: "8px", padding: "0 24px",
-                color: "#fff", fontSize: "14px", fontWeight: 600, cursor: phase === "scanning" ? "not-allowed" : "pointer",
-                opacity: !target.trim() ? 0.4 : 1,
-                boxShadow: phase !== "scanning" && target.trim() ? "0 0 20px #0070f344" : "none",
-                transition: "all 0.2s",
-              }}
-            >
-              {phase === "scanning" ? "Scanning..." : "Analyze →"}
-            </button>
-          </div>
+          ) : (
+            /* Single target input row */
+            <div style={{ display: "flex", gap: "8px", marginBottom: "16px" }}>
+              <div style={{
+                flex: 1, display: "flex", alignItems: "center",
+                background: "#111418", border: "1px solid #ffffff15",
+                borderRadius: "8px", padding: "0 16px",
+                transition: "border-color 0.2s",
+              }}>
+                <span style={{ color: "#333", marginRight: "10px", fontSize: "14px" }}>$</span>
+                <input
+                  value={target}
+                  onChange={e => setTarget(e.target.value)}
+                  onKeyDown={e => e.key === "Enter" && runScan()}
+                  placeholder="domain.com, IP address, username..."
+                  style={{
+                    flex: 1, background: "none", border: "none", outline: "none",
+                    color: "#e0e0e0", fontSize: "14px", fontFamily: "'JetBrains Mono', monospace",
+                    padding: "14px 0",
+                  }}
+                />
+              </div>
+              <select
+                value={targetType}
+                onChange={e => setTargetType(e.target.value)}
+                style={{
+                  background: "#111418", border: "1px solid #ffffff15", color: "#888",
+                  borderRadius: "8px", padding: "0 12px", fontSize: "13px",
+                  fontFamily: "'JetBrains Mono', monospace", cursor: "pointer",
+                }}
+              >
+                <option value="auto">auto-detect</option>
+                <option value="domain">domain</option>
+                <option value="ip">ip</option>
+                <option value="username">username</option>
+              </select>
+              <button
+                onClick={() => runScan()}
+                disabled={phase === "scanning" || !target.trim()}
+                style={{
+                  background: phase === "scanning" ? "#0a3a50" : "linear-gradient(135deg, #0070f3, #00e5ff)",
+                  border: "none", borderRadius: "8px", padding: "0 24px",
+                  color: "#fff", fontSize: "14px", fontWeight: 600, cursor: phase === "scanning" ? "not-allowed" : "pointer",
+                  opacity: !target.trim() ? 0.4 : 1,
+                  boxShadow: phase !== "scanning" && target.trim() ? "0 0 20px #0070f344" : "none",
+                  transition: "all 0.2s",
+                }}
+              >
+                {phase === "scanning" ? "Scanning..." : "Analyze →"}
+              </button>
+            </div>
+          )}
 
           {/* Demo mode banner + target chips */}
           {isDemoMode && (
@@ -605,7 +939,10 @@ const exportJSON = () => {
         )}
 
         {/* Results */}
-        {phase === "results" && result && (
+        {phase === "results" && result && result.campaign_report ? (
+          /* ── Campaign Results ─────────────────────────────────────────────── */
+          <CampaignResults report={result.campaign_report} targets={result.targets} onReset={reset} />
+        ) : phase === "results" && result && (
           <div>
             {/* Top bar */}
             <div style={{
@@ -1036,9 +1373,11 @@ const exportJSON = () => {
             border: "1px dashed #ffffff10", borderRadius: "12px", padding: "60px",
             textAlign: "center", color: "#333",
           }}>
-            <div style={{ fontSize: "32px", marginBottom: "12px" }}>⬡</div>
+            <div style={{ fontSize: "32px", marginBottom: "12px" }}>{campaignMode ? "⬡⬡⬡" : "⬡"}</div>
             <div style={{ fontSize: "14px", fontFamily: "'JetBrains Mono', monospace" }}>
-              Enter a target or click a demo above to run an analysis
+              {campaignMode
+                ? "Paste related indicators above — one per line — to begin campaign analysis"
+                : "Enter a target or click a demo above to run an analysis"}
             </div>
           </div>
         )}

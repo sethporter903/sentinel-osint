@@ -20,6 +20,7 @@ from fetchers import (
     fetch_vt_passive_dns,
     fetch_github,
     generate_ioc_report,
+    generate_campaign_report,
     detect_input_type,
 )
 from fetch_threatfox import fetch_threatfox
@@ -176,6 +177,36 @@ async def analyze(target: str = Query(..., description="Domain, IP, hash, or URL
 
 class BatchRequest(BaseModel):
     targets: List[str]
+
+
+class CampaignRequest(BaseModel):
+    targets: List[str]
+
+
+@router.post("/analyze/campaign")
+async def analyze_campaign(body: CampaignRequest):
+    """
+    Analyze a set of related IOCs as a unified campaign.
+    Runs each target through the full pipeline concurrently, then synthesizes
+    all results into a campaign-level assessment via LLM.
+    """
+    if not body.targets:
+        return {"error": "No targets provided"}
+
+    semaphore = asyncio.Semaphore(10)
+
+    async def analyze_one(t: str) -> dict:
+        async with semaphore:
+            return await _analyze_target(t)
+
+    individual_results = list(await asyncio.gather(*[analyze_one(t) for t in body.targets]))
+    campaign_report = await generate_campaign_report(individual_results)
+
+    return {
+        "targets": body.targets,
+        "individual_results": individual_results,
+        "campaign_report": campaign_report,
+    }
 
 
 @router.post("/analyze/batch")

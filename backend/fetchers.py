@@ -1244,6 +1244,162 @@ Return ONLY valid JSON matching this exact schema, no preamble, no markdown back
 }"""
 
 
+_CAMPAIGN_SYSTEM_PROMPT = """You are a senior threat intelligence analyst specializing in campaign attribution, infrastructure clustering, and adversary tracking. You will receive individual OSINT analysis reports for a set of indicators (IPs, domains, file hashes) that a security team believes may be related. Your job is to analyze them holistically and produce a campaign-level assessment.
+
+## What to look for
+
+**Shared infrastructure signals (strongest evidence of coordination):**
+- Same ASN, hosting provider, or IP range across multiple indicators
+- Same registrar, registration date window (within 7 days of each other), or privacy service
+- Shared nameservers across domains
+- Overlapping passive DNS — domains resolving to the same IPs, or vice versa
+- Same malware family or ThreatFox malware tag across multiple indicators
+- Matching naming conventions: keyword patterns, TLD preferences, subdomain structures, or typosquat targets
+
+**Temporal signals:**
+- Infrastructure stood up in a tight time window (all registered within days of each other)
+- Coordinated first-seen / last-seen dates in threat feeds
+- Rapid succession of new DNS resolutions suggesting fast-flux or automated staging
+
+**Behavioral signals:**
+- Same open ports or service banners across IPs (identical C2 fingerprints)
+- Matching AbuseIPDB abuse categories across multiple IPs
+- Same OTX threat actor or pulse campaign attributing multiple indicators
+- Overlapping MITRE ATT&CK techniques across individual reports
+
+## Infrastructure role classification
+
+Assign each indicator to exactly one role based on evidence:
+- **c2**: Command-and-control servers — IPs with suspicious open ports (4444, 8080, 443/non-standard), Shodan fingerprints matching C2 frameworks, ThreatFox "botnet_cc" type, or AbuseIPDB categories suggesting botnet traffic
+- **delivery**: Initial access infrastructure — phishing domains, typosquats of known brands, malware distribution hosts, URLhaus entries, payload delivery ThreatFox type
+- **exfiltration**: Data staging or exfil endpoints — high-volume egress patterns, known exfil services, suspicious outbound-only listening profiles
+- **unknown**: Insufficient data to assign a role; list here rather than guessing
+
+## Verdict definitions
+- **coordinated_malicious**: Strong evidence of deliberate coordination — shared infrastructure, timing, tooling, or attribution pointing to a single threat actor or campaign
+- **likely_related**: Multiple indicators share some signals but evidence is circumstantial or partial; could be shared hosting or coincidence
+- **unrelated**: Indicators show no meaningful overlap; appear to be from different sources or actors
+- **unknown**: Insufficient data across the dataset to make a determination
+
+## Output rules
+- shared_patterns must be specific and cite evidence (e.g. "All 3 domains registered with Namecheap within 48 hours" not just "same registrar")
+- threat_actor_hypothesis should name known groups if OTX/ThreatFox provide named attribution, otherwise describe behavioral profile
+- Do not include a pattern in shared_patterns unless you can cite specific data from the individual reports
+- If only one indicator has a meaningful verdict, campaign_verdict must be "unknown" — you need at least two coordinated indicators to make a campaign call
+- recommended_actions must be campaign-level (hunting queries, blocking by ASN/registrar, IOC sharing) not just repeating individual indicator actions
+- confidence: reflects how strongly the shared signals support the campaign verdict (not data quality). High when multiple independent signals corroborate coordination, low when only one or two weak signals overlap.
+
+Return ONLY valid JSON matching this exact schema, no preamble, no markdown:
+{
+  "campaign_verdict": "coordinated_malicious" | "likely_related" | "unrelated" | "unknown",
+  "confidence": 0-100,
+  "summary": "3-4 sentence plain English assessment suitable for a CISO or incident commander",
+  "shared_patterns": ["specific pattern 1 with cited evidence", "specific pattern 2"],
+  "infrastructure_map": {
+    "c2": ["indicator1", "indicator2"],
+    "delivery": ["indicator3"],
+    "exfiltration": [],
+    "unknown": ["indicator4"]
+  },
+  "threat_actor_hypothesis": "Named group or behavioral profile description; null if completely unknown",
+  "mitre_techniques": [{"technique_id": "T1583.001", "technique_name": "Acquire Infrastructure: Domains", "justification": "one sentence citing which indicators"}],
+  "recommended_actions": ["campaign-level action 1", "campaign-level action 2"]
+}"""
+
+
+async def generate_campaign_report(individual_results: list[dict]) -> dict:
+    """Synthesize individual IOC analyses into a campaign-level assessment."""
+    summaries = []
+    for r in individual_results:
+        target = r.get("target", "unknown")
+        itype = r.get("input_type", "unknown")
+        report = r.get("report", {})
+
+        # Extract the key fields the LLM needs without dumping everything
+        entry = {
+            "target": target,
+            "type": itype,
+            "verdict": report.get("verdict", "unknown") if isinstance(report, dict) else "unknown",
+            "confidence": report.get("overall_confidence") if isinstance(report, dict) else None,
+            "summary": report.get("summary", "") if isinstance(report, dict) else "",
+            "key_findings": (report.get("key_findings", []) if isinstance(report, dict) else [])[:5],
+            "mitre_techniques": [
+                t.get("technique_id") for t in (report.get("mitre_techniques", []) if isinstance(report, dict) else [])
+            ][:5],
+        }
+
+        # Enrich with the most attribution-relevant raw fields
+        whois = r.get("whois", {})
+        if isinstance(whois, dict):
+            for field in ("asn", "org", "country", "network", "registrar", "created", "nameservers"):
+                if whois.get(field):
+                    entry[f"whois_{field}"] = whois[field]
+
+        greynoise = r.get("greynoise", {})
+        if isinstance(greynoise, dict) and greynoise.get("raw"):
+            gn = greynoise["raw"]
+            entry["greynoise_classification"] = gn.get("classification")
+            entry["greynoise_riot"] = gn.get("riot", False)
+
+        otx = r.get("otx", {})
+        if isinstance(otx, dict) and otx.get("raw"):
+            entry["otx_pulses"] = otx["raw"].get("pulse_count", 0)
+            entry["otx_malware_families"] = otx["raw"].get("malware_families", [])[:3]
+            entry["otx_threat_actors"] = otx["raw"].get("threat_actors", [])[:3]
+
+        shodan = r.get("shodan", {})
+        if isinstance(shodan, dict) and shodan.get("raw"):
+            entry["shodan_ports"] = (shodan["raw"].get("ports") or [])[:10]
+
+        abuseipdb = r.get("abuseipdb", {})
+        if isinstance(abuseipdb, dict) and abuseipdb.get("raw"):
+            entry["abuseipdb_score"] = abuseipdb["raw"].get("abuseConfidenceScore")
+
+        threatfox = r.get("threatfox", {})
+        if isinstance(threatfox, dict) and threatfox.get("raw") and threatfox["raw"].get("ioc_count", 0) > 0:
+            entry["threatfox_iocs"] = threatfox["raw"].get("ioc_count", 0)
+            iocs = threatfox["raw"].get("iocs", [])[:2]
+            entry["threatfox_malware"] = [i.get("malware_printable") for i in iocs if i.get("malware_printable")]
+            entry["threatfox_threat_types"] = [i.get("threat_type") for i in iocs if i.get("threat_type")]
+
+        summaries.append(entry)
+
+    user_message = (
+        f"Analyze the following {len(summaries)} indicator(s) for campaign-level coordination:\n\n"
+        + json.dumps(summaries, indent=2)
+    )
+
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "https://api.anthropic.com/v1/messages",
+                headers={
+                    "x-api-key": ANTHROPIC_API_KEY,
+                    "anthropic-version": "2023-06-01",
+                    "content-type": "application/json",
+                },
+                json={
+                    "model": "claude-sonnet-4-5",
+                    "max_tokens": 2000,
+                    "system": _CAMPAIGN_SYSTEM_PROMPT,
+                    "messages": [{"role": "user", "content": user_message}],
+                },
+                timeout=90,
+            )
+            response.raise_for_status()
+            data = response.json()
+            text = data["content"][0]["text"]
+
+        try:
+            clean = text.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+            return json.loads(clean)
+        except (json.JSONDecodeError, ValueError):
+            return {"error": "Campaign report parsing failed", "raw": text}
+
+    except Exception as e:
+        return {"error": f"Campaign report generation failed: {str(e)}"}
+
+
 async def generate_ioc_report(target: str, input_type: str, source_results: dict) -> dict:
     truncated = {k: str(v)[:800] for k, v in source_results.items()}
 
