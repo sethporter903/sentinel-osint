@@ -304,8 +304,16 @@ const runScan = async (t) => {
       setCompletedSteps(prev => [...prev, step.id]);
     }
 
+    // 90-second hard timeout — prevents the UI freezing if the backend hangs
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 90_000);
+
     try {
-      const response = await fetch(`/api/analyze?target=${encodeURIComponent(tgt)}`);
+      const response = await fetch(
+        `/api/analyze?target=${encodeURIComponent(tgt)}`,
+        { signal: controller.signal },
+      );
+      clearTimeout(timeoutId);
       const data = await response.json();
       if (data.demo_error) {
         setDemoError(data.message);
@@ -315,7 +323,15 @@ const runScan = async (t) => {
       }
       setResult(data);
     } catch (err) {
-      console.error("API error:", err);
+      clearTimeout(timeoutId);
+      if (err.name === "AbortError") {
+        setDemoError("Request timed out — the server took too long to respond.");
+      } else {
+        setDemoError("Could not reach the analysis server. Is the backend running?");
+      }
+      setCurrentStep(null);
+      setPhase("idle");
+      return;
     }
 
     setCurrentStep(null);

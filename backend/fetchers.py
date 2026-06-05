@@ -1,5 +1,4 @@
 import whois
-from ipwhois import IPWhois
 import os
 import re
 import json
@@ -63,11 +62,23 @@ async def fetch_whois(target: str) -> dict:
     # ── IP address: use RDAP ─────────────────────────────────────────────────
     if input_type == "ip":
         def _rdap():
+            # Lazy import so a missing package only breaks IP WHOIS,
+            # not the entire fetchers module at startup.
+            try:
+                from ipwhois import IPWhois
+            except ImportError:
+                return None
             obj = IPWhois(target)
-            return obj.lookup_rdap(depth=1, socket_timeout=10)
+            return obj.lookup_rdap(depth=1, socket_timeout=8)
 
         try:
-            r = await loop.run_in_executor(None, _rdap)
+            # Hard ceiling: if RDAP bootstrapping + lookup takes > 12 s, give up.
+            r = await asyncio.wait_for(
+                loop.run_in_executor(None, _rdap),
+                timeout=12.0,
+            )
+            if r is None:
+                return {"note": "IP WHOIS unavailable (install ipwhois package)"}
             out: dict = {}
             if r.get("asn"):
                 out["asn"] = f"AS{r['asn']}"
@@ -82,6 +93,8 @@ async def fetch_whois(target: str) -> dict:
             if r.get("asn_registry"):
                 out["registry"] = r["asn_registry"].upper()
             return out if out else {"note": "No IP registration data found"}
+        except asyncio.TimeoutError:
+            return {"note": "IP registration lookup timed out"}
         except Exception:
             return {"note": "IP WHOIS (RDAP) lookup unavailable"}
 
