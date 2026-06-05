@@ -1,4 +1,5 @@
 import whois
+from ipwhois import IPWhois
 import os
 import re
 import json
@@ -51,45 +52,78 @@ def detect_input_type(target: str) -> str:
 # ─────────────────────────────────────────────
 
 async def fetch_whois(target: str) -> dict:
+    """
+    IP addresses  → RDAP lookup via ipwhois (handles ARIN/RIPE/APNIC/etc.)
+    Domains       → traditional WHOIS via python-whois
+    Everything else → not applicable
+    """
+    input_type = detect_input_type(target)
     loop = asyncio.get_event_loop()
-    try:
-        data = await loop.run_in_executor(None, partial(whois.whois, target))
 
-        # Build result from whatever fields are populated; skip blanks
-        result: dict = {}
-        if data.registrar:
-            result["registrar"] = data.registrar
-        if data.creation_date:
-            result["created"] = str(
-                data.creation_date[0] if isinstance(data.creation_date, list)
-                else data.creation_date
-            )
-        if data.expiration_date:
-            result["expires"] = str(
-                data.expiration_date[0] if isinstance(data.expiration_date, list)
-                else data.expiration_date
-            )
-        if data.name:
-            result["registrant"] = data.name
-        if data.country:
-            result["country"] = data.country
-        if data.name_servers:
-            result["nameservers"] = sorted(
-                {ns.lower().rstrip(".") for ns in data.name_servers}
-            )
+    # ── IP address: use RDAP ─────────────────────────────────────────────────
+    if input_type == "ip":
+        def _rdap():
+            obj = IPWhois(target)
+            return obj.lookup_rdap(depth=1, socket_timeout=10)
 
-        if result:
-            return result
+        try:
+            r = await loop.run_in_executor(None, _rdap)
+            out: dict = {}
+            if r.get("asn"):
+                out["asn"] = f"AS{r['asn']}"
+            if r.get("asn_description"):
+                out["org"] = r["asn_description"]
+            if r.get("asn_country_code"):
+                out["country"] = r["asn_country_code"]
+            if r.get("asn_cidr"):
+                out["network"] = r["asn_cidr"]
+            if r.get("asn_date"):
+                out["allocated"] = r["asn_date"]
+            if r.get("asn_registry"):
+                out["registry"] = r["asn_registry"].upper()
+            return out if out else {"note": "No IP registration data found"}
+        except Exception:
+            return {"note": "IP WHOIS (RDAP) lookup unavailable"}
 
-        # python-whois parsed successfully but returned no usable fields
-        return {"note": "No WHOIS record found for this target"}
+    # ── Domain: traditional WHOIS ────────────────────────────────────────────
+    if input_type == "domain":
+        try:
+            data = await loop.run_in_executor(None, partial(whois.whois, target))
 
-    except Exception as e:
-        msg = str(e).lower()
-        if "no output" in msg or "no match" in msg or "not found" in msg:
-            return {"note": "No WHOIS record found for this target"}
-        # Any other exception — return a clean note, not a raw traceback string
-        return {"note": "WHOIS lookup unavailable"}
+            result: dict = {}
+            if data.registrar:
+                result["registrar"] = data.registrar
+            if data.creation_date:
+                result["created"] = str(
+                    data.creation_date[0] if isinstance(data.creation_date, list)
+                    else data.creation_date
+                )
+            if data.expiration_date:
+                result["expires"] = str(
+                    data.expiration_date[0] if isinstance(data.expiration_date, list)
+                    else data.expiration_date
+                )
+            if data.name:
+                result["registrant"] = data.name
+            if data.country:
+                result["country"] = data.country
+            if data.name_servers:
+                result["nameservers"] = sorted(
+                    {ns.lower().rstrip(".") for ns in data.name_servers}
+                )
+
+            if result:
+                return result
+            return {"note": "No WHOIS record found for this domain"}
+
+        except Exception as e:
+            msg = str(e).lower()
+            if "no output" in msg or "no match" in msg or "not found" in msg:
+                return {"note": "No WHOIS record found for this domain"}
+            return {"note": "WHOIS lookup unavailable"}
+
+    # ── Hash / URL / email / unknown: not applicable ─────────────────────────
+    return {"note": "WHOIS not applicable for this input type"}
 
 
 # ─────────────────────────────────────────────
