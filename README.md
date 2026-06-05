@@ -21,6 +21,25 @@
 
 ---
 
+## Screenshots
+
+### Single IOC Analysis
+Submit any IP, domain, file hash, or URL and receive a full multi-source triage report with a risk score, WHOIS data, and corroborating GitHub intel.
+
+![Single IOC Analysis — 185.220.101.45 flagged CRITICAL 95/100 with WHOIS and GitHub intel](screenshots/single-ioc-analysis.png)
+
+### AI Triage Report
+Claude synthesizes all source data into a structured verdict with a three-component confidence breakdown, supporting and conflicting evidence, and MITRE ATT&CK mappings.
+
+![AI Triage Report — MALICIOUS verdict, 96% data quality, 87% model certainty, 92% overall confidence](screenshots/ai-triage-report.png)
+
+### Campaign Analysis
+Submit a group of related indicators and receive a unified campaign-level verdict, shared pattern extraction, and an infrastructure map grouping indicators by role.
+
+![Campaign Analysis — Cobalt Strike C2 Cluster, COORDINATED MALICIOUS at 98% confidence, infrastructure map showing C2 IPs and malleable C2 domains](screenshots/campaign-analysis.png)
+
+---
+
 ## Overview
 
 SentinelOSINT is a full-stack IOC enrichment and triage platform. Submit an IP address, domain, file hash, or URL and it fans out to eleven threat intelligence sources concurrently, then passes the aggregated results to Claude to produce a structured triage assessment — verdict, confidence breakdown, MITRE ATT&CK mappings, recommended actions, and TLP classification.
