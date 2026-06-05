@@ -54,16 +54,42 @@ async def fetch_whois(target: str) -> dict:
     loop = asyncio.get_event_loop()
     try:
         data = await loop.run_in_executor(None, partial(whois.whois, target))
-        return {
-            "registrar": data.registrar or "N/A",
-            "created": str(data.creation_date[0] if isinstance(data.creation_date, list) else data.creation_date),
-            "expires": str(data.expiration_date[0] if isinstance(data.expiration_date, list) else data.expiration_date),
-            "registrant": data.name or "REDACTED",
-            "country": data.country or "N/A",
-            "nameservers": data.name_servers or [],
-        }
+
+        # Build result from whatever fields are populated; skip blanks
+        result: dict = {}
+        if data.registrar:
+            result["registrar"] = data.registrar
+        if data.creation_date:
+            result["created"] = str(
+                data.creation_date[0] if isinstance(data.creation_date, list)
+                else data.creation_date
+            )
+        if data.expiration_date:
+            result["expires"] = str(
+                data.expiration_date[0] if isinstance(data.expiration_date, list)
+                else data.expiration_date
+            )
+        if data.name:
+            result["registrant"] = data.name
+        if data.country:
+            result["country"] = data.country
+        if data.name_servers:
+            result["nameservers"] = sorted(
+                {ns.lower().rstrip(".") for ns in data.name_servers}
+            )
+
+        if result:
+            return result
+
+        # python-whois parsed successfully but returned no usable fields
+        return {"note": "No WHOIS record found for this target"}
+
     except Exception as e:
-        return {"error": str(e)}
+        msg = str(e).lower()
+        if "no output" in msg or "no match" in msg or "not found" in msg:
+            return {"note": "No WHOIS record found for this target"}
+        # Any other exception — return a clean note, not a raw traceback string
+        return {"note": "WHOIS lookup unavailable"}
 
 
 # ─────────────────────────────────────────────

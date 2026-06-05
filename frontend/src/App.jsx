@@ -55,6 +55,19 @@ const DEMO_TARGETS = {
   },
 };
 
+// Well-known friendly names → canonical targets.
+// Applied before every API call so users can type natural names.
+const KNOWN_ALIASES = {
+  "google dns":        "8.8.8.8",
+  "google public dns": "8.8.8.8",
+  "google dns 2":      "8.8.4.4",
+  "cloudflare":        "1.1.1.1",
+  "cloudflare dns":    "1.1.1.1",
+  "quad9":             "9.9.9.9",
+  "opendns":           "208.67.222.222",
+  "localhost":         "127.0.0.1",
+};
+
 const STEPS = [
   { id: "whois", label: "WHOIS Lookup", icon: "🔍", duration: 1200 },
   { id: "dns", label: "Passive DNS Resolution", icon: "🌐", duration: 900 },
@@ -272,8 +285,11 @@ export default function OSINTDemo() {
   }, []);
 
 const runScan = async (t) => {
-    const tgt = t || target.trim();
-    if (!tgt) return;
+    const raw = (t || target.trim()).trim();
+    if (!raw) return;
+    // Resolve friendly names (e.g. "Google DNS" → "8.8.8.8") before querying
+    const tgt = KNOWN_ALIASES[raw.toLowerCase()] ?? raw;
+    if (tgt !== raw) setTarget(tgt);   // update input to show canonical form
     setPhase("scanning");
     setCompletedSteps([]);
     setCurrentStep(null);
@@ -635,14 +651,24 @@ const exportJSON = () => {
                       ↗ who.is
                     </a>
                   </div>
-                  {Object.entries(result.whois).map(([k, v]) => (
-                    <div key={k} style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px", gap: "12px" }}>
-                      <span style={{ color: "#555", fontSize: "12px", fontFamily: "'JetBrains Mono', monospace", minWidth: 100 }}>{k}</span>
-                      <span style={{ color: "#e0e0e0", fontSize: "12px", fontFamily: "'JetBrains Mono', monospace", textAlign: "right", wordBreak: "break-all" }}>
-                        {Array.isArray(v) ? v.join(", ") : v}
-                      </span>
-                    </div>
-                  ))}
+                  {(() => {
+                    const whoisNote = result.whois?.error || result.whois?.note;
+                    const whoisRows = Object.entries(result.whois || {}).filter(([k]) => k !== "error" && k !== "note");
+                    return whoisNote && whoisRows.length === 0 ? (
+                      <div style={{ color: "#444", fontSize: "12px", fontStyle: "italic", fontFamily: "'JetBrains Mono', monospace" }}>
+                        {whoisNote}
+                      </div>
+                    ) : (
+                      whoisRows.map(([k, v]) => (
+                        <div key={k} style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px", gap: "12px" }}>
+                          <span style={{ color: "#555", fontSize: "12px", fontFamily: "'JetBrains Mono', monospace", minWidth: 100 }}>{k}</span>
+                          <span style={{ color: "#e0e0e0", fontSize: "12px", fontFamily: "'JetBrains Mono', monospace", textAlign: "right", wordBreak: "break-all" }}>
+                            {Array.isArray(v) ? v.join(", ") : String(v)}
+                          </span>
+                        </div>
+                      ))
+                    );
+                  })()}
                 </div>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
