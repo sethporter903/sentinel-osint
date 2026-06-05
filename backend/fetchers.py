@@ -1176,11 +1176,16 @@ Tailor actions to the input type — IP actions differ from domain actions diffe
 - If all sources return not_applicable or not_found, return verdict: unknown with a summary explaining insufficient data
 - top_supporting_evidence: the 2–3 signals that most strongly support your verdict. Be specific — cite source names and values (e.g. "AbuseIPDB: 100/100 confidence from 94 reports across 31 reporters"). Do not simply restate the verdict or repeat key_findings verbatim; focus on the raw evidence.
 - top_conflicting_evidence: 1–2 signals that genuinely contradict the verdict, introduce uncertainty, or make the case less clear-cut. For a malicious verdict, note any false-positive risk or ambiguity (e.g. shared hosting, Tor exit used by legitimate privacy tools, known test file). For a benign verdict, note anything mildly suspicious. You must actively look for these — do not default to an empty array just because the overall verdict seems obvious. Only return an empty array if, after a genuine search, there is truly nothing that could argue the other way.
+- source_confidence (integer 0-100): Score the quality, quantity, and agreement of the raw source data — independently of your own interpretation. Rubric: 90-100 = multiple high-reliability sources in strong agreement with rich data; 70-89 = 2+ sources agree but data is partial or one source is lower reliability; 50-69 = limited data, only one meaningful source, or sources partially conflict; 30-49 = sparse data, mostly not_applicable/not_found, or significant source disagreement; 0-29 = almost no usable data. Drop this score when sources conflict, when most return not_applicable, or when the only signal is from a single low-confidence community report.
+- llm_confidence (integer 0-100): Score how certain you are in your own reasoning and interpretation, independent of data quality. High when the evidence pattern is unambiguous and maps cleanly to a verdict with no plausible alternative explanation. Drop this score when evidence could reasonably support multiple interpretations, when you are relying on indirect or circumstantial signals, or when legitimate alternative explanations exist even if the data is good (e.g. Tor exit legitimacy, shared hosting, known test files, privacy-tools overlap).
+- overall_confidence (integer 0-100): Compute as round((source_confidence * 0.6) + (llm_confidence * 0.4)). Source confidence is weighted higher because it reflects ground-truth data rather than model inference. Do not adjust this manually — calculate it.
 
 Return ONLY valid JSON matching this exact schema, no preamble, no markdown backticks:
 {
   "verdict": "malicious" | "suspicious" | "benign" | "unknown",
-  "confidence": "high" | "medium" | "low",
+  "source_confidence": 85,
+  "llm_confidence": 78,
+  "overall_confidence": 82,
   "summary": "2-3 sentence plain English assessment a non-technical stakeholder can understand",
   "key_findings": ["finding 1", "finding 2", "finding 3"],
   "mitre_techniques": [{"technique_id": "T1583.001", "technique_name": "Acquire Infrastructure: Domains", "justification": "one sentence"}],
@@ -1212,7 +1217,7 @@ async def generate_ioc_report(target: str, input_type: str, source_results: dict
                 },
                 json={
                     "model": "claude-sonnet-4-5",
-                    "max_tokens": 1400,
+                    "max_tokens": 1600,
                     "system": _SYSTEM_PROMPT,
                     "messages": [{"role": "user", "content": user_message}],
                 },

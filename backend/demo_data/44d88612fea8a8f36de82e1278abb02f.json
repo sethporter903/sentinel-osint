@@ -132,7 +132,9 @@
   },
   "report": {
     "verdict": "benign",
-    "confidence": "high",
+    "source_confidence": 91,
+    "llm_confidence": 88,
+    "overall_confidence": 90,
     "summary": "44d88612fea8a8f36de82e1278abb02f is the MD5 hash of the EICAR antivirus test file — a standardised, harmless 68-byte string that every antivirus engine is required to detect, used globally to verify that AV software is functioning correctly. While MalwareBazaar classifies it as a known file and AV engines flag it as 'malicious', this is by design and reflects the test file's purpose, not actual malicious intent. Encountering this hash in your environment most likely indicates AV software testing, security tooling validation, or developer unit tests — not an actual infection.",
     "key_findings": [
       "MalwareBazaar identifies this as the EICAR standard antivirus test file — not real malware, but a harmless 68-byte compliance test string",

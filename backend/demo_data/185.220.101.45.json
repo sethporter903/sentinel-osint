@@ -231,7 +231,9 @@
   },
   "report": {
     "verdict": "malicious",
-    "confidence": "high",
+    "source_confidence": 96,
+    "llm_confidence": 87,
+    "overall_confidence": 92,
     "summary": "185.220.101.45 is a confirmed Tor exit node actively used as botnet C2 infrastructure. All five applicable threat intelligence sources independently flag this IP: AbuseIPDB returns a perfect 100/100 score from 94 reports, ThreatFox attributes it to Mirai and Hajime botnets with 100% confidence, and GreyNoise classifies it as an active malicious mass-scanner. Any inbound or outbound connections to this IP in your environment should be treated as a confirmed incident until proven otherwise.",
     "key_findings": [
       "AbuseIPDB: 100/100 abuse score from 94 reports across 31 distinct reporters — highest possible confidence rating",

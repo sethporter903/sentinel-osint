@@ -915,13 +915,47 @@ const exportJSON = () => {
                 }}>
                   {typeof result.report === 'object' ? (
   <div>
-    {/* Verdict + confidence badge */}
+    {/* Verdict */}
     <div style={{ marginBottom: "16px" }}>
       <span style={{ color: result.report.verdict === "malicious" ? "#ff4444" : result.report.verdict === "suspicious" ? "#ffaa00" : "#00e5ff", fontWeight: "bold", textTransform: "uppercase", fontSize: "13px" }}>
         {result.report.verdict}
       </span>
-      <span style={{ color: "#555", fontSize: "12px", marginLeft: "10px" }}>confidence: {result.report.confidence}</span>
     </div>
+
+    {/* Confidence breakdown */}
+    {(() => {
+      // Support both new numeric fields and old "high/medium/low" string
+      const legacy = { high: 80, medium: 55, low: 30 };
+      const sc = result.report.source_confidence  ?? legacy[result.report.confidence] ?? null;
+      const lc = result.report.llm_confidence     ?? legacy[result.report.confidence] ?? null;
+      const oc = result.report.overall_confidence ?? legacy[result.report.confidence] ?? null;
+      if (oc === null) return null;
+      const bars = [
+        { label: "Data Quality",    val: sc, hint: "Quality & agreement of raw intelligence sources" },
+        { label: "Model Certainty", val: lc, hint: "Model's certainty in its own interpretation" },
+        { label: "Overall",         val: oc, hint: "Weighted combination (data weighted 60 %)" },
+      ];
+      const barColor = v => v >= 75 ? "#00e5ff" : v >= 50 ? "#ffd700" : "#ff8c42";
+      return (
+        <div style={{ marginBottom: "24px", padding: "14px 16px", background: "#0a0c0f", borderRadius: "8px", border: "1px solid #ffffff08" }}>
+          <div style={{ color: "#444", fontSize: "10px", letterSpacing: "0.1em", fontFamily: "'JetBrains Mono', monospace", marginBottom: "12px" }}>
+            CONFIDENCE BREAKDOWN
+          </div>
+          {bars.map(({ label, val, hint }) => (
+            <div key={label} style={{ marginBottom: "10px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "4px" }}>
+                <span style={{ color: "#888", fontSize: "11px", fontFamily: "'JetBrains Mono', monospace" }}>{label}</span>
+                <span style={{ color: barColor(val), fontSize: "12px", fontFamily: "'JetBrains Mono', monospace", fontWeight: 700 }}>{val}%</span>
+              </div>
+              <div style={{ height: "3px", background: "#ffffff0a", borderRadius: "2px", overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${val}%`, background: barColor(val), borderRadius: "2px", boxShadow: `0 0 6px ${barColor(val)}55`, transition: "width 0.8s ease" }} />
+              </div>
+              <div style={{ color: "#333", fontSize: "10px", fontFamily: "'JetBrains Mono', monospace", marginTop: "3px" }}>{hint}</div>
+            </div>
+          ))}
+        </div>
+      );
+    })()}
 
     {/* Summary */}
     <p style={{ marginBottom: "24px" }}>{result.report.summary}</p>

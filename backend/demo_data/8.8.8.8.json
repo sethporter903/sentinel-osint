@@ -153,7 +153,9 @@
   },
   "report": {
     "verdict": "benign",
-    "confidence": "high",
+    "source_confidence": 98,
+    "llm_confidence": 95,
+    "overall_confidence": 97,
     "summary": "8.8.8.8 is Google's primary public DNS resolver, one of the most recognizable and widely used IP addresses on the internet. GreyNoise RIOT — a curated list of known benign services — identifies it as Google Public DNS with high confidence. AbuseIPDB returns a score of 0 with no reports. The 2 low-confidence OTX pulses are contextual research entries rather than threat indicators. There is no basis for concern; if this IP is appearing in your logs, it indicates devices using Google's public DNS service.",
     "key_findings": [
       "GreyNoise RIOT=true: definitively identified as Google Public DNS — strongest possible benign signal in the dataset",
