@@ -57,6 +57,56 @@ This project exists in two versions:
 
 ---
 
+## Architecture
+
+```mermaid
+flowchart TD
+    User([Analyst\nBrowser]) -->|IP · Domain · Hash · URL| FE
+
+    subgraph Frontend [React Frontend — Vite · TypeScript · Tailwind]
+        FE[App.jsx\nSingle-IOC · Campaign · Review tabs]
+    end
+
+    FE <-->|REST  /api/analyze\n/api/analyze/batch\n/api/analyze/campaign| BE
+
+    subgraph Backend [FastAPI Backend — Python · Uvicorn]
+        BE[main.py\nRoutes & request handling]
+        BE --> FH[fetchers.py\nasyncio.gather — 11 concurrent sources]
+        BE -.->|DEMO_MODE=true| DM[(demo_data/\nPre-cached JSON)]
+        DM -.-> BE
+    end
+
+    FH --> S1[WHOIS / RDAP]
+    FH --> S2[AlienVault OTX]
+    FH --> S3[GreyNoise]
+    FH --> S4[AbuseIPDB]
+    FH --> S5[Shodan]
+    FH --> S6[MalwareBazaar]
+    FH --> S7[URLhaus]
+    FH --> S8[CIRCL Passive DNS]
+    FH --> S9[VirusTotal Passive DNS]
+    FH --> S10[GitHub Search]
+    FH --> S11[ThreatFox]
+
+    S1 & S2 & S3 & S4 & S5 & S6 & S7 & S8 & S9 & S10 & S11 -->|aggregated source data| LLM
+
+    LLM[Claude — Anthropic API\nStructured triage synthesis]
+    LLM -->|verdict · confidence · MITRE ATT&CK · TLP\nkey findings · recommended actions| FH
+    FH --> BE
+    BE --> FE
+    FE -->|Rendered report\nSummary · Indicators · Sources · AI Report| User
+
+    subgraph Benchmark [Benchmark — benchmark/]
+        GT[ground_truth.json\n20 benign + 20 malicious IPs]
+        BM[run_benchmark.py\nprecision · recall · FPR · FNR · F1]
+        GT --> BM
+    end
+
+    BM -->|GET /api/analyze per target| BE
+```
+
+---
+
 ## Features
 
 ### Single-IOC Analysis
@@ -333,6 +383,23 @@ See [`benchmark/README.md`](benchmark/README.md) for full methodology, dataset s
 python benchmark/run_benchmark.py --help
 # --api-url, --delay, --strict, --output, --targets
 ```
+
+### Results
+
+Evaluated against 40 IP addresses (20 benign, 20 malicious) using the local backend with live threat intelligence sources. OTX and GreyNoise keys were not configured for this run — results reflect partial source coverage (see caveats in [`benchmark/README.md`](benchmark/README.md)).
+
+| Metric | Lenient threshold¹ | Strict threshold² |
+|---|---|---|
+| **Accuracy** | 82.5% | 67.5% |
+| **Precision** | 84.2% | 88.9% |
+| **Recall (TPR)** | 80.0% | 40.0% |
+| **F1 Score** | 0.821 | 0.552 |
+| **False Positive Rate** | 15.0% | 5.0% |
+| **False Negative Rate** | 20.0% | 60.0% |
+| TP / TN / FP / FN | 16 / 17 / 3 / 4 | 8 / 19 / 1 / 12 |
+
+¹ Lenient: `malicious` or `suspicious` verdict counts as a positive prediction.  
+² Strict: only `malicious` verdict counts as a positive prediction. The low recall under strict mode is expected — Tor exit nodes and lower-confidence IPs are correctly flagged `suspicious` rather than `malicious`, which counts as a miss only under this threshold.
 
 ---
 
